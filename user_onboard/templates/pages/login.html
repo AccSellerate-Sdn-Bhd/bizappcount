@@ -1,0 +1,75 @@
+{% load link_tags %}
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Login</title>
+  {% imports %}
+</head>
+
+<body class="flex h-screen">
+  <!-- Left Side -->
+  <div style="background-color: #211f1f;" class="flex-1 text-white p-10 flex flex-col items-center justify-center">
+    <div class="w-11/12">
+      <h1 class="text-5xl font-bold mb-9">Bizapp Count 1 Solusi Akaun Anda</h1>
+      <h2 class="text-xl mb-9">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
+        ut labore et dolore magna aliqua.</h2>
+      <div class="mb-4">
+        <div class="flex items-center mb-4">
+          <svg class="w-6 h-6 text-white mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.5 12L10 16.5l8-8"></path>
+          </svg>
+          <p class="text-md">Link terus dengan Bizapp</p>
+        </div>
+        <div class="flex items-center mb-4">
+          <svg class="w-6 h-6 text-white mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.5 12L10 16.5l8-8"></path>
+          </svg>
+          <p class="text-md">Akaun, P&L dan Balance Sheet Lengkap</p>
+        </div>
+        <div class="flex items-center mb-4">
+          <svg class="w-6 h-6 text-white mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.5 12L10 16.5l8-8"></path>
+          </svg>
+          <p class="text-md">1 Solusi, Desktop dan juga mobile</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Side -->
+  <div class="flex flex-col flex-1 bg-white border items-center justify-center">
+    <div class="border border-gray-200 p-14 rounded mb-6 w-2/3">
+      <img src="your-logo.png" alt="Logo" class="w-20 h-20">
+      <form method="post">
+        {% csrf_token %}
+        {{ form.username.label_tag }}
+        {{ form.username }}
+
+        {{ form.password.label_tag }}
+        {{ form.password }}
+
+        {% if form.errors %}
+          <div class="text-red-500">
+            <ul>
+              {% for field, errors in form.errors.items %}
+              {% for error in errors %}
+              <li>{{ error }}</li>
+              {% endfor %}
+              {% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+          
+        <button type="submit" class="bg-blue-500 text-white w-full py-2 px-4 rounded hover:bg-black mt-5">Login</button>
+        <p class="mt-6">Don't have an account yet? <a href="/register/user/1" class="underline text-blue-500">Register for free</a></p>
+      </form>
+    </div>
+  </div>
+
+</body>
+
+</html>

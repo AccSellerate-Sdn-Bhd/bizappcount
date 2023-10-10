@@ -1,0 +1,83 @@
+{% load ui_tags %}
+{% load link_tags %}
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Create Software Costs</title>
+  {% imports %}
+</head>
+
+<body>
+  {% header user=user.username %}
+
+  <div class="flex pt-20">
+    <!-- Sidebar -->
+    {% sidebar_template url="/dashboard/account-setup" request=request %}
+    <!-- Content -->
+    <div class="w-4/5 ml-auto p-8">
+      <h1 class="text-2xl font-bold">Create new software cost</h1>
+      <p class="text-gray-400 mt-3 mb-6">Please enter the details down below</p>
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="flex">
+          <div class="flex-1">
+            {{form.name.label_tag}}
+            {{form.name}}
+
+            {{form.company_name.label_tag}}
+            {{form.company_name}}
+
+            {{form.software_billing_info.label_tag}}
+            {{form.software_billing_info}}
+
+            <div class="w-1/2 pr-2">
+              {{form.type.label_tag}}
+              {{form.type}}
+            </div>
+
+            <div class="flex">
+              <div class="flex-1 pr-2">
+                {{form.amount.label_tag}}
+                {{form.amount}}
+              </div>
+
+              <div class="flex-1">
+                {{form.billing_duration.label_tag}}
+                {{form.billing_duration}}
+              </div>
+            </div>
+
+            <div class="flex flex-row mt-3">
+              {{form.active}}
+              <div class="mr-3"></div>
+              {{form.active.label_tag}}
+            </div>
+
+          </div>
+
+          <div class="flex-1 pl-5">
+          </div>
+        </div>
+        {% if form.errors %}
+        <div class="text-red-500">
+          <ul>
+            {% for field, errors in form.errors.items %}
+            {% for error in errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+        <div class="flex justify-end mt-5">
+          <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md mr-2">Create</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</body>
+
+</html>

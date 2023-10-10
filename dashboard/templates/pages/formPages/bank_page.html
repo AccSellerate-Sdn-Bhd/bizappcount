@@ -1,0 +1,145 @@
+{% load ui_tags %}
+{% load link_tags %}
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Create Bank Account</title>
+  {% imports %}
+</head>
+
+<body>
+  {% header user=user.username %}
+
+  <div class="flex pt-20">
+    <!-- Sidebar -->
+    {% sidebar_template url="/dashboard/account-setup" request=request %}
+    <!-- Content -->
+    <div class="w-4/5 ml-auto p-8">
+      <h1 class="text-2xl font-bold">Create a new bank account</h1>
+      <p class="text-gray-400 mt-3 mb-6">Please enter the details down below</p>
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="flex">
+          <div class="flex-1">
+            {{form.name.label_tag}}
+            {{form.name}}
+
+            {{form.account_no.label_tag}}
+            {{form.account_no}}
+
+            {{form.type.label_tag}}
+            {{form.type}}
+
+            <div class="flex flex-row items-center">
+              <div class="mr-3">
+                {{form.bizapp}}
+              </div>
+              Please check if Bizapp
+            </div>
+          </div>
+          <div class="flex-1 pl-5">
+            {{form.create_new_address}}
+            {{form.create_new_address.label_tag}}
+            <div class="mb-5"></div>
+
+            <div id="existing-address-content" style="display: block; ">
+              <h3 class="mb-5">Select Address:</h3>
+              <div style="max-height: 370px; overflow-y: auto;">
+                <div class="flex flex-col">
+                  {% for choice in form.address %}
+                  <div class="flex flex-row items-start border border-black p-2 rounded-md w-2/3 mb-3">
+                    <div class="flex items-start pt-2 mr-3">
+                      {{ choice.tag }}
+                    </div>
+                    <div class="text-right w-full">
+                      <p>{{ choice.choice_label.line_one }}</p>
+                      <p>{{ choice.choice_label.line_two }}</p>
+                      <p>
+                        {{ choice.choice_label.postcode }},
+                        {{ choice.choice_label.city }},
+                        {{choice.choice_label.state}}
+                      </p>
+                      <p>{{ choice.choice_label.GPS_location }}</p>
+                      <p>{{ choice.office_tel_no }}</p>
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+
+            <div id="address-content" style="display: none; ">
+              <h3 class="mb-3">Create new address: </h3>
+              {{ form.line_one.label_tag }}
+              {{ form.line_one }}
+
+              {{ form.line_two.label_tag }}
+              {{ form.line_two }}
+
+              <div class="w-1/2 pr-2">
+                {{ form.postcode.label_tag }}
+                {{ form.postcode }}
+              </div>
+
+              <div style="display: flex; justify-content: space-between;">
+                <div style="flex: 1;" class="pr-2">
+                  {{ form.city.label_tag }}
+                  {{ form.city }}
+                </div>
+                <div style="flex: 1;">
+                  {{ form.state.label_tag }}
+                  {{ form.state }}
+                </div>
+              </div>
+
+
+              {{ form.gps_location.label_tag }}
+              {{ form.gps_location }}
+
+              {{ form.office_tel_no.label_tag }}
+              {{ form.office_tel_no }}
+            </div>
+          </div>
+        </div>
+        {% if form.errors %}
+        <div class="text-red-500">
+          <ul>
+            {% for field, errors in form.errors.items %}
+            {% for error in errors %}
+            <li>{{ error }}</li>
+            {% endfor %}
+            {% endfor %}
+          </ul>
+        </div>
+        {% endif %}
+        <div class="flex justify-end mt-5">
+          <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md mr-2">Create</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const createNewAddressCheckbox = document.getElementById("create_new_address");
+      const addressContent = document.getElementById("address-content");
+      const existingAddressContent = document.getElementById("existing-address-content");
+
+      createNewAddressCheckbox.addEventListener("change", function () {
+        if (createNewAddressCheckbox.checked) {
+          addressContent.style.display = "block";
+          existingAddressContent.style.display = "none";
+        } else {
+          addressContent.style.display = "none";
+          existingAddressContent.style.display = "block";
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,53 @@
+{% load ui_tags %}
+{% load link_tags %}
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>User on board</title>
+  {% imports %}
+</head>
+
+<body>
+  {% header user=name %}
+  <div class="container mx-auto w-4/5 mt-20">
+    <div class="bg-white p-10 rounded-lg shadow-lg">
+
+      <div class="w-full rounded-full h-3 mt-5 mb-6 flex ">
+        <div class="bg-blue-500 rounded-full h-3 w-1/3"></div>
+        <div class="bg-blue-500 rounded-full h-3 w-1/3"></div>
+        <div class="bg-blue-500 rounded-full h-3 w-1/3"></div>
+      </div>
+
+      <h2 class="text-2xl font-semibold mb-3">Welcome {{name}}, thank you for registering with BizApp.</h2>
+      <p class="text-gray-600 mb-5">Please confirm your business details below (You can edit these information later)
+      </p>
+
+      <div class="mt-10">
+        <p>Business name: {{business.name}}</p>
+        <p>type: {{business.type}}</p>
+        <p>Registration number: {{business.registration_no}}</p>
+        <p>Website Url: {{business.website_url}}</p>
+
+        <div class="p-2 mt-5 border border-black w-1/3">
+          <p>Address:</p>
+          <div class="text-left pt-2 pl-2"> 
+            <p>{{address.line_one}}</p>
+            <p>{{address.line_two}}</p>
+            <p>{{address.postcode}}, {{address.city}}, {{address.state}}</p>
+            <p>{{address.GPS_location}}</p>
+            <p>{{address.office_tel_no}}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <div class="flex justify-end mt-14">
+          <button type="button" onclick="window.location.href='/dashboard/account-setup'" class="bg-blue-500 text-white px-4 py-2 rounded-md mr-2">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

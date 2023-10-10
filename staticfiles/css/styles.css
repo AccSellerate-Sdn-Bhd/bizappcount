@@ -1,0 +1,13 @@
+@font-face {
+  font-family: 'CustomFont';
+  src: url('../fonts/Roboto-Regular.ttf') format('truetype');
+}
+
+/* Apply the custom font to specific elements */
+body {
+  font-family: 'CustomFont', sans-serif;
+}
+
+h1, h2, h3 {
+  font-family: 'CustomFont', sans-serif;
+}

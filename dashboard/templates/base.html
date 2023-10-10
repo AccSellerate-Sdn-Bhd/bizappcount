@@ -1,0 +1,45 @@
+{% load ui_tags %}
+{% load link_tags %}
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+  <title>Bizapp</title>
+  {% imports %}
+</head>
+
+<body>
+  {% header user=user.username %}
+
+  <div class="flex pt-20">
+    <!-- Sidebar -->
+    {% sidebar_template url=url request=request %}
+    <!-- Content -->
+    <div class="w-4/5 ml-auto p-8">
+        {% block content %}
+        <!-- This block will be replaced by the content of child templates -->
+        {% endblock %}
+    </div>
+
+  </div>
+
+  <!-- <script>
+    const buttons = document.querySelectorAll('button');
+    buttons.forEach(button => {
+      button.addEventListener('click', () => {
+        const content = button.nextElementSibling;
+        content.classList.toggle('hidden');
+        const icon = button.querySelector('svg');
+        icon.classList.toggle('rotate-0');
+      });
+    });
+  </script> -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  
+</body>
+
+</html>

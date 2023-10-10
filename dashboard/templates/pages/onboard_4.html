@@ -1,0 +1,554 @@
+{% load ui_tags %}
+{% load link_tags %}
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Account setup</title>
+  {% imports %}
+</head>
+
+<body>
+  {% header user=user.username %}
+
+  <div class="flex pt-20">
+    <!-- Sidebar -->
+    {% sidebar_template url="/dashboard/account-setup" request=request %}
+    <!-- Content -->
+    <div class="w-4/5 ml-auto p-8">
+      <h1 class="text-2xl font-bold">Account Setup</h1>
+      <p class="text-gray-400 mt-3 mb-6">Account setup / Setting Up Accounts</p>
+      <p class="text-xl mt-3">Account Setup for {{business.name}}</p>
+
+      <!-- Bank Accounts -->
+      <div class="border border-gray-200 mt-7">
+        <button class="flex items-center justify-between p-4 w-full text-left bg-gray-200">
+          <span class="text-md">1. Bank Account</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-transform transform rotate-0"
+            viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd"
+              d="M6.293 7.293a1 1 0 011.414 0L10 9.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+              clip-rule="evenodd" />
+          </svg>
+        </button>
+        <div class="p-4 bg-white border-gray-200">
+          <div class="flex justify-between items-center pb-2">
+            <div class="flex flex-col">
+              <label for="search" class="text-gray-600 mb-2">Search:</label>
+              <div class="relative flex items-center">
+                <input type="text" id="search"
+                  class="border-2 border-gray-300 p-2 rounded-lg pl-8 focus:outline-none focus:border-blue-500"
+                  placeholder="Search...">
+                <i class="fas fa-search absolute left-2 text-gray-400"></i>
+              </div>
+            </div>
+
+            <div class="flex space-x-2">
+              <button class="border border-blue-500 w-24 text-blue-500 p-2 rounded-sm hover:bg-blue-100">
+                <i class="fas fa-plus"></i>
+                Filter
+              </button>
+              <button class="border border-blue-500 w-24 text-blue-500 p-2 rounded-sm hover:bg-blue-100">
+                <i class="fas fa-plus"></i>
+                Sort
+              </button>
+            </div>
+          </div>
+
+
+          <table class="table-auto w-full border-collapse border mt-6">
+            <thead>
+              <tr>
+                <th class="border p-2">Account No.</th>
+                <th class="border p-2">Name</th>
+                <th class="border p-2">Type</th>
+                <th class="border p-2">Address</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for bank in banks %}
+              <tr>
+                <td class="border p-2">{{bank.account_no}}</td>
+                <td class="border p-2">{{bank.name}}</td>
+                <td class="border p-2">{{bank.type}}</td>
+                <td class="border p-2">{{bank.address.city}}, {{bank.address.state}}</td>
+              </tr>
+              {% endfor %}
+
+
+            </tbody>
+          </table>
+
+          <div class="shadow-md p-4 flex items-center justify-between mt-10">
+            <div>
+              <i class="fas fa-times text-black text-lg"></i>
+            </div>
+
+            <a class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" href="/dashboard/bank/create">Create
+              Bank Account</a>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Retail/Offices -->
+      <div class="border border-gray-200 mt-7">
+        <button class="flex items-center justify-between p-4 w-full text-left bg-gray-200">
+          <span class="text-md">2. Retail/Offices</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-transform transform rotate-0"
+            viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd"
+              d="M6.293 7.293a1 1 0 011.414 0L10 9.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+              clip-rule="evenodd" />
+          </svg>
+        </button>
+
+        <div class="p-4 bg-white border-gray-200">
+          <div class="flex justify-between items-center pb-2">
+            <div class="flex flex-col">
+              <label for="search" class="text-gray-600 mb-2">Search:</label>
+              <div class="relative flex items-center">
+                <input type="text" id="search"
+                  class="border-2 border-gray-300 p-2 rounded-lg pl-8 focus:outline-none focus:border-blue-500"
+                  placeholder="Search...">
+                <i class="fas fa-search absolute left-2 text-gray-400"></i>
+              </div>
+            </div>
+
+            <div class="flex space-x-2">
+              <button class="border border-blue-500 w-24 text-blue-500 p-2 rounded-sm hover:bg-blue-100">
+                <i class="fas fa-plus"></i>
+                Filter
+              </button>
+              <button class="border border-blue-500 w-24 text-blue-500 p-2 rounded-sm hover:bg-blue-100">
+                <i class="fas fa-plus"></i>
+                Sort
+              </button>
+            </div>
+          </div>
+
+
+          <table class="table-auto w-full border-collapse border mt-6">
+            <thead>
+              <tr>
+                <th class="border p-2">No.</th>
+                <th class="border p-2">Name</th>
+                <th class="border p-2">Address</th>
+                <th class="border p-2">Rented</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for office in offices %}
+              <tr>
+                <td class="border p-2">{{forloop.counter}}</td>
+                <td class="border p-2">{{office.name}}</td>
+                <td class="border p-2">{{office.address.city}}, {{office.address.state}}</td>
+                <td class="border p-2">{% if office.rent %} Rented {% else %} Owned {% endif %}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+
+          <div class="shadow-md p-4 flex items-center justify-between mt-10">
+            <div>
+              <i class="fas fa-times text-black text-lg"></i>
+            </div>
+
+            <a href="/dashboard/office/create" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Create
+              Office</a>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Fixed Asset Information -->
+      <div class="border border-gray-200 mt-7">
+        <button class="flex items-center justify-between p-4 w-full text-left bg-gray-200">
+          <span class="text-md">3. Staff</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-transform transform rotate-0"
+            viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd"
+              d="M6.293 7.293a1 1 0 011.414 0L10 9.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+              clip-rule="evenodd" />
+          </svg>
+        </button>
+        <div class="p-4 bg-white border-gray-200">
+          <div class="flex justify-between items-center pb-2">
+            <!-- Left Aligned Label and Text Field with Magnifying Glass Icon -->
+            <div class="flex flex-col">
+              <label for="search" class="text-gray-600 mb-2">Search:</label>
+              <div class="relative flex items-center">
+                <input type="text" id="search"
+                  class="border-2 border-gray-300 p-2 rounded-lg pl-8 focus:outline-none focus:border-blue-500"
+                  placeholder="Search...">
+                <i class="fas fa-search absolute left-2 text-gray-400"></i>
+              </div>
+            </div>
+
+            <!-- Three Buttons (Solid Blue, Border Blue) with Cross Icons -->
+            <div class="flex space-x-2">
+              <button class="border border-blue-500 w-24 text-blue-500 p-2 rounded-sm hover:bg-blue-100">
+                <i class="fas fa-plus"></i>
+                Filter
+              </button>
+              <button class="border border-blue-500 w-24 text-blue-500 p-2 rounded-sm hover:bg-blue-100">
+                <i class="fas fa-plus"></i>
+                Sort
+              </button>
+            </div>
+          </div>
+
+
+          <table class="table-auto w-full border-collapse border mt-6">
+            <thead>
+              <tr>
+                <th class="border p-2">No.</th>
+                <th class="border p-2">Name</th>
+                <th class="border p-2">Position</th>
+                <th class="border p-2">Phone Number</th>
+                <th class="border p-2">Date Joined</th>
+                <th class="border p-2">Address</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for staff in staffs %}
+              <tr>
+                <td class="border p-2">{{forloop.counter}}</td>
+                <td class="border p-2">{{staff.name}}</td>
+                <td class="border p-2">{{staff.position}}</td>
+                <td class="border p-2">{{staff.phone_no}}</td>
+                <td class="border p-2">{{staff.date_joined}}</td>
+                <td class="border p-2">{{staff.address.city}}, {{staff.address.state}}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+
+          <div class="shadow-md p-4 flex items-center justify-between mt-10">
+            <div>
+              <i class="fas fa-times text-black text-lg"></i>
+            </div>
+
+            <a class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" href="/dashboard/staff/create">Create
+              Staff</a>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Current Liabilities Information -->
+      <div class="border border-gray-200 mt-7">
+        <button class="flex items-center justify-between p-4 w-full text-left bg-gray-200">
+          <span class="text-md">4. Inventory</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-transform transform rotate-0"
+            viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd"
+              d="M6.293 7.293a1 1 0 011.414 0L10 9.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+              clip-rule="evenodd" />
+          </svg>
+        </button>
+        <div class="p-4 bg-white border-gray-200">
+          <div class="flex justify-between items-center pb-2">
+            <!-- Left Aligned Label and Text Field with Magnifying Glass Icon -->
+            <div class="flex flex-col">
+              <label for="search" class="text-gray-600 mb-2">Search:</label>
+              <div class="relative flex items-center">
+                <input type="text" id="search"
+                  class="border-2 border-gray-300 p-2 rounded-lg pl-8 focus:outline-none focus:border-blue-500"
+                  placeholder="Search...">
+                <i class="fas fa-search absolute left-2 text-gray-400"></i>
+              </div>
+            </div>
+
+            <!-- Three Buttons (Solid Blue, Border Blue) with Cross Icons -->
+            <div class="flex space-x-2">
+              <button class="border border-blue-500 w-24 text-blue-500 p-2 rounded-sm hover:bg-blue-100">
+                <i class="fas fa-plus"></i>
+                Filter
+              </button>
+              <button class="border border-blue-500 w-24 text-blue-500 p-2 rounded-sm hover:bg-blue-100">
+                <i class="fas fa-plus"></i>
+                Sort
+              </button>
+            </div>
+          </div>
+
+
+          <table class="table-auto w-full border-collapse border mt-6">
+            <thead>
+              <tr>
+                <th class="border p-2">No.</th>
+                <th class="border p-2">Name</th>
+                <th class="border p-2">Description</th>
+                <th class="border p-2">Brand</th>
+                <th class="border p-2">SKU</th>
+                <th class="border p-2">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for product in products %}
+              <tr>
+                <td class="border p-2">{{forloop.counter}}</td>
+                <td class="border p-2">{{product.name}}</td>
+                <td class="border p-2">{{product.description}}</td>
+                <td class="border p-2">{{product.brand}}</td>
+                <td class="border p-2">{{product.SKU}}</td>
+                <td class="border p-2">{{product.status}}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+
+          <div class="shadow-md p-4 flex items-center justify-between mt-10">
+            <div>
+              <i class="fas fa-times text-black text-lg"></i>
+            </div>
+
+            <a class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              href="/dashboard/product/create">Create Product</a>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Current Liabilities Information -->
+      <div class="border border-gray-200 mt-7">
+        <button class="flex items-center justify-between p-4 w-full text-left bg-gray-200">
+          <span class="text-md">5. Loans</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-transform transform rotate-0"
+            viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd"
+              d="M6.293 7.293a1 1 0 011.414 0L10 9.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+              clip-rule="evenodd" />
+          </svg>
+        </button>
+        <div class="p-4 bg-white border-gray-200">
+          <div class="flex justify-between items-center pb-2">
+            <!-- Left Aligned Label and Text Field with Magnifying Glass Icon -->
+            <div class="flex flex-col">
+              <label for="search" class="text-gray-600 mb-2">Search:</label>
+              <div class="relative flex items-center">
+                <input type="text" id="search"
+                  class="border-2 border-gray-300 p-2 rounded-lg pl-8 focus:outline-none focus:border-blue-500"
+                  placeholder="Search...">
+                <i class="fas fa-search absolute left-2 text-gray-400"></i>
+              </div>
+            </div>
+
+            <!-- Three Buttons (Solid Blue, Border Blue) with Cross Icons -->
+            <div class="flex space-x-2">
+              <button class="border border-blue-500 w-24 text-blue-500 p-2 rounded-sm hover:bg-blue-100">
+                <i class="fas fa-plus"></i>
+                Filter
+              </button>
+              <button class="border border-blue-500 w-24 text-blue-500 p-2 rounded-sm hover:bg-blue-100">
+                <i class="fas fa-plus"></i>
+                Sort
+              </button>
+            </div>
+          </div>
+
+
+          <table class="table-auto w-full border-collapse border mt-6">
+            <thead>
+              <tr>
+                <th class="border p-2">No.</th>
+                <th class="border p-2">Name</th>
+                <th class="border p-2">Creditor</th>
+                <th class="border p-2">Category</th>
+                <th class="border p-2">Amount Payable</th>
+                <th class="border p-2">Installment Amount</th>
+                <th class="border p-2">Active</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for loan in loans %}
+              <tr>
+                <td class="border p-2">{{forloop.counter}}</td>
+                <td class="border p-2">{{loan.name}}</td>
+                <td class="border p-2">{{loan.creditor}}</td>
+                <td class="border p-2">{{loan.category}}</td>
+                <td class="border p-2">{{loan.amount_payable}}</td>
+                <td class="border p-2">{{loan.installment_amount}}</td>
+                <td class="border p-2">{% if loan.active %} active {% else %} inactive {% endif %}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+
+          <div class="shadow-md p-4 flex items-center justify-between mt-10">
+            <div>
+              <i class="fas fa-times text-black text-lg"></i>
+            </div>
+
+            <a class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" href="/dashboard/loan/create">Create Loan</a>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Current Liabilities Information -->
+      <div class="border border-gray-200 mt-7">
+        <button class="flex items-center justify-between p-4 w-full text-left bg-gray-200">
+          <span class="text-md">6. Software Costs</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-transform transform rotate-0"
+            viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd"
+              d="M6.293 7.293a1 1 0 011.414 0L10 9.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+              clip-rule="evenodd" />
+          </svg>
+        </button>
+        <div class="p-4 bg-white border-gray-200">
+          <div class="flex justify-between items-center pb-2">
+            <!-- Left Aligned Label and Text Field with Magnifying Glass Icon -->
+            <div class="flex flex-col">
+              <label for="search" class="text-gray-600 mb-2">Search:</label>
+              <div class="relative flex items-center">
+                <input type="text" id="search"
+                  class="border-2 border-gray-300 p-2 rounded-lg pl-8 focus:outline-none focus:border-blue-500"
+                  placeholder="Search...">
+                <i class="fas fa-search absolute left-2 text-gray-400"></i>
+              </div>
+            </div>
+
+            <!-- Three Buttons (Solid Blue, Border Blue) with Cross Icons -->
+            <div class="flex space-x-2">
+              <button class="border border-blue-500 w-24 text-blue-500 p-2 rounded-sm hover:bg-blue-100">
+                <i class="fas fa-plus"></i>
+                Filter
+              </button>
+              <button class="border border-blue-500 w-24 text-blue-500 p-2 rounded-sm hover:bg-blue-100">
+                <i class="fas fa-plus"></i>
+                Sort
+              </button>
+            </div>
+          </div>
+
+
+          <table class="table-auto w-full border-collapse border mt-6">
+            <thead>
+              <tr>
+                <th class="border p-2">No.</th>
+                <th class="border p-2">Name</th>
+                <th class="border p-2">Company Name</th>
+                <th class="border p-2">Type</th>
+                <th class="border p-2">Amount</th>
+                <th class="border p-2">Active</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for software_cost in software_costs %}
+              <tr>
+                <td class="border p-2">{{forloop.counter}}</td>
+                <td class="border p-2">{{software_cost.name}}</td>
+                <td class="border p-2">{{software_cost.company_name}}</td>
+                <td class="border p-2">{{software_cost.type}}</td>
+                <td class="border p-2">{{software_cost.amount}}</td>
+                <td class="border p-2">{% if software_cost.active %} active {% else %} inactive {% endif %}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+
+          <div class="shadow-md p-4 flex items-center justify-between mt-10">
+            <div>
+              <i class="fas fa-times text-black text-lg"></i>
+            </div>
+
+            <a class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" href="/dashboard/software-cost/create">Create Software Cost</a>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Current Liabilities Information -->
+      <div class="border border-gray-200 mt-7">
+        <button class="flex items-center justify-between p-4 w-full text-left bg-gray-200">
+          <span class="text-md">7. Owner Equity</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-transform transform rotate-0"
+            viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd"
+              d="M6.293 7.293a1 1 0 011.414 0L10 9.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+              clip-rule="evenodd" />
+          </svg>
+        </button>
+        <div class="p-4 bg-white border-gray-200">
+          <div class="flex justify-between items-center pb-2">
+            <!-- Left Aligned Label and Text Field with Magnifying Glass Icon -->
+            <div class="flex flex-col">
+              <label for="search" class="text-gray-600 mb-2">Search:</label>
+              <div class="relative flex items-center">
+                <input type="text" id="search"
+                  class="border-2 border-gray-300 p-2 rounded-lg pl-8 focus:outline-none focus:border-blue-500"
+                  placeholder="Search...">
+                <i class="fas fa-search absolute left-2 text-gray-400"></i>
+              </div>
+            </div>
+
+            <!-- Three Buttons (Solid Blue, Border Blue) with Cross Icons -->
+            <div class="flex space-x-2">
+              <button class="border border-blue-500 w-24 text-blue-500 p-2 rounded-sm hover:bg-blue-100">
+                <i class="fas fa-plus"></i>
+                Filter
+              </button>
+              <button class="border border-blue-500 w-24 text-blue-500 p-2 rounded-sm hover:bg-blue-100">
+                <i class="fas fa-plus"></i>
+                Sort
+              </button>
+            </div>
+          </div>
+
+
+          <table class="table-auto w-full border-collapse border mt-6">
+            <thead>
+              <tr>
+                <th class="border p-2">No.</th>
+                <th class="border p-2">Name</th>
+                <th class="border p-2">IC/Passport</th>
+                <th class="border p-2">Nationality</th>
+                <th class="border p-2">Bumiputera</th>
+                <th class="border p-2">Percentage Ownership</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for owner_equity in owner_equities %}
+              <tr>
+                <td class="border p-2">{{forloop.counter}}</td>
+                <td class="border p-2">{{owner_equity.name}}</td>
+                <td class="border p-2">{{owner_equity.ic_passport}}</td>
+                <td class="border p-2">{{owner_equity.nationality}}</td>
+                <td class="border p-2">{% if owner_equity.bumiputera %} yes {% else %} no {% endif %}</td>
+                <td class="border p-2">{{owner_equity.percentage_ownership}}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+
+          <div class="shadow-md p-4 flex items-center justify-between mt-10">
+            <div>
+              <i class="fas fa-times text-black text-lg"></i>
+            </div>
+
+            <a class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" href="/dashboard/owner-equity/create">Create Owner Equity</a>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const buttons = document.querySelectorAll('button');
+    buttons.forEach(button => {
+      button.addEventListener('click', () => {
+        const content = button.nextElementSibling;
+        content.classList.toggle('hidden');
+        const icon = button.querySelector('svg');
+        icon.classList.toggle('rotate-0');
+      });
+    });
+  </script>
+</body>
+
+</html>

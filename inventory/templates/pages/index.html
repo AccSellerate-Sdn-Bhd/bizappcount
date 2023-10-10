@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+  <h1>Inventory</h1>
+  <a href="create" class="btn btn-success">Create Inventory</a>
+</div>
+
+<table class="table table-striped table-bordered table-hover">
+  <thead class="thead-dark">
+    <tr>
+      <th>No.</th>
+      <th>Name</th>
+      <th>Product</th>
+      <th>Amount</th>
+      <th>Price Per Unit</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Loop through your sales data and populate this table -->
+    {% for item in inventory %}
+    <tr>
+      <td>{{ forloop.counter }}</td>
+      <td>{{ item.name }}</td>
+      <td>{{ item.product.name}}</td>
+      <td>{{ item.amount }} {{ item.unit }}</td>
+      <td>{{ item.price_per_unit }}</td>
+      <td>
+        <!-- Here, you can add buttons or links for specific actions like edit or delete -->
+        <a href="edit/{{item.inventory_id}}" class="btn btn-primary btn-sm">Edit</a>
+        <a href="history/{{item.inventory_id}}" class="btn btn-primary btn-sm">History</a>
+        {% csrf_token %}
+        <button class="delete-button btn btn-danger btn-sm" data-id="{{ item.inventory_id }}">Delete</button>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const deleteButtons = document.querySelectorAll(".delete-button");
+
+    deleteButtons.forEach(function (deleteButton) {
+      deleteButton.addEventListener("click", function () {
+        const id = deleteButton.getAttribute("data-id");
+        const url = `api/delete/${id}`;
+        console.log("clicked");
+        fetch(url, {
+          method: "DELETE",
+          headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "Content-Type": "application/json",
+          },
+        })
+          .then(async (response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log(data);
+            window.location.reload();
+          })
+          .catch((error) => {
+            console.error("Fetch Error: ", error);
+          });
+      });
+    });
+  });
+</script>
+
+</div>
+
+{% endblock %}
