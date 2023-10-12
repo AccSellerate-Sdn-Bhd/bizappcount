@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'report',
     'dashboard',
     'rest_framework',
-    'inventory'
+    'inventory',
+    'expenses'
 ]
 
 MIDDLEWARE = [
@@ -102,7 +103,7 @@ DATABASES = {
         'ENGINE': 'mysql.connector.django',
         'NAME': 'bizapp',
         'USER': 'root',
-        'PASSWORD': 'root',
+        'PASSWORD': 'MyNewPass',
         'HOST': '127.0.0.1',  
         'PORT': '3306',
         'OPTIONS': {

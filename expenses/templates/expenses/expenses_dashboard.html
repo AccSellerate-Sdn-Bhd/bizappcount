@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+    <h2>Expenses Data</h2>
+    <a href="{% url 'create_expense' %}" class="btn btn-success">Create Expenses</a>
+</div>
+
+<!-- Tabs Navigation -->
+<ul class="nav nav-tabs">
+    <li class="nav-item">
+        <a class="nav-link active" data-toggle="tab" href="#viewByTransaction">View by Transaction</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#viewByLineItems">View by Line Items</a>
+    </li>
+</ul>
+
+<div class="tab-content mt-3">
+    <div id="viewByTransaction" class="tab-pane fade  show active">
+        <!-- Table for View by Transaction -->
+        <table class="table table-striped table-bordered table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>No.</th>
+                    <th>Transaction ID</th>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Date</th>
+                    <th>Payee</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Recurring Date</th>
+                    <th>Recurring Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Loop through your sales data and populate this table -->
+                {% for expense in expenses_data %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ expense.expense_id }}</td>
+                    <td>{{ expense.type }}</td>
+                    <td>{{ expense.title }}</td>
+                    <td>{{ expense.date }}</td>
+                    <td>{{ expense.payee }}</td>
+                    <td>{{ expense.status }}</td>
+                    <td>{{ expense.recurring_date }}</td>
+                    <td>{{ expense.recurring_amount }}</td>
+                    <td>
+                        <!-- Here, you can add buttons or links for specific actions like edit or delete -->
+                        <a href="{% url 'edit_expenses' expense.expense_id %}" class="btn btn-primary btn-sm">Edit</a>
+                        <a href="{% url 'delete_expenses' expense.expense_id %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">Delete</a>
+                        <!-- <a href="{% url 'generate_quotation' expense.expense_id %}" class="btn btn-secondary btn-sm">Quotation</a> -->
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+
+    <div id="viewByLineItems" class="tab-pane fade">
+        <table class="table table-striped table-bordered table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>No</th>
+                    <th>Transaction ID</th>
+                    <th>Unit Discount</th>
+                    <th>Total Price</th>
+                    <th>Quantity</th>
+                    <th>Product</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for expense_line in expenses_line_data %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ expense_line.expense_id.expense_id }}</td>
+                    <td>{{ expense_line.unit_discount }}</td> <!-- Assuming SalesLineItems model has a product_id field -->
+                    <td>{{ expense_line.total_price }}</td> <!-- Assuming SalesLineItems model has a product_name field -->
+                    <td>{{ expense_line.quantity }}</td>
+                    <td>{{ expense_line.product_id.name  }}</td> <!-- Placeholder: Adjust based on your SalesLineItems model -->
+                    <td>
+                        <!-- Here, you can add buttons or links for specific actions like edit or delete -->
+                        <a href="#" class="btn btn-primary btn-sm">Edit</a>
+                        <a href="{% url 'delete_expenses_line' expense_line.expense_line_id %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+
+</div>
+
+{% endblock %}

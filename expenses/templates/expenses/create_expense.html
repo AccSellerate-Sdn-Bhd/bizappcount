@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+{% block content %}
+
+{% if messages %}
+    {% for message in messages %}
+        <script>alert("{{ message }}");</script>
+    {% endfor %}
+{% endif %}
+
+<h2>Create Expenses Entry</h2>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<form method="post" action="{% url 'create_expense' %}">
+<!-- Expenses Header Form -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white" data-bs-toggle="collapse" href="#expensesHeader" role="button">
+        Expenses Header
+    </div>
+    <div class="collapse show" id="expensesHeader">
+        <div class="card-body">
+            
+                {% csrf_token %}
+                <div class="row">
+                    <!-- Left column -->
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="{{ form.expense_id.id_for_label }}" class="form-label">Expenses Transaction No</label>
+                            <input  type="text" class="form-control" id="{{ form.expense_id.id_for_label }}" name="{{ form.expense_id.name }}" >
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.title.id_for_label }}" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="{{ form.title.id_for_label }}" name="{{ form.title.name }}" value="{{ form.title.value|default:'' }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.type.id_for_label }}" class="form-label">Type</label>
+                            <input type="text" class="form-control" id="{{ form.type.id_for_label }}" name="{{ form.type.name }}" value="{{ form.type.value|default:'' }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.payee.id_for_label }}" class="form-label">Payee</label>
+                            <input type="text" class="form-control" id="{{ form.payee.id_for_label }}" name="{{ form.payee.name }}" value="{{ form.payee.value|default:'' }}" required>
+                        </div>                        
+
+                        <div class="mb-3">
+                            <label for="{{ form.date.id_for_label }}" class="form-label">Date</label>
+                            <input type="date" class="form-control" id="{{ form.date.id_for_label }}" name="{{ form.date.name }}" value="{{ form.date.value }}">
+                        </div>
+                    </div>
+
+                    <!-- Right column -->
+                    <div class="col-md-6">
+
+                        <div class="mb-3">
+                            <label for="{{ form.due_date.id_for_label }}" class="form-label">Due Date</label>
+                            <input type="date" class="form-control" id="{{ form.due_date.id_for_label }}" name="{{ form.due_date.name }}" value="{{ form.due_date.value|date:"Y-m-d"|default:'' }}>
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.status.id_for_label }}" class="form-label">Status</label>
+                            <select class="form-control" id="{{ form.status.id_for_label }}" name="{{ form.status.name }}">
+                                <option value="New">New</option>
+                                <option value="In Process">In Process</option>
+                                <option value="In-Delivery">In-Delivery</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="{{ form.recurring.id_for_label }}" name="{{ form.recurring.name }}" {% if form.recurring.value %}checked{% endif %}>
+                            <label class="form-check-label" for="{{ form.recurring.id_for_label }}">Recurring</label>
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.recurring_date.id_for_label }}" class="form-label">Recurring Date</label>
+                            <input type="date" class="form-control" id="{{ form.recurring_date.id_for_label }}" name="{{ form.recurring_date.name }}" >
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.recurring_amount.id_for_label }}" class="form-label">Recurring Amount</label>
+                            <input type="text" class="form-control" id="{{ form.recurring_amount.id_for_label }}" name="{{ form.recurring_amount.name }}" value="{{ form.recurring_amount.value|default:'' }}" required>
+                        </div>
+                        <!-- ... And more fields for the right column here ... -->
+                    </div>
+                </div>
+            
+        </div>
+    </div>
+</div>
+
+
+
+    <!-- Line Items Form -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white" data-bs-toggle="collapse" href="#lineItems" role="button">
+            Line Items
+        </div>
+        <div class="collapse" id="lineItems">
+            <div class="card-body">
+                <!-- Wrap the table with 'table-responsive' for horizontal scrolling on small screens -->
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover table-striped">
+                        <thead class="table-primary"> <!-- Gives a nice blue shade to header -->
+                            <tr>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Unit Discount</th>
+                                <th>Total Price</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{ formset.management_form }}
+                            {% for form in formset %}
+                            <tr>
+                                <td>{{ form.product_id }}</td>
+                                <td>{{ form.quantity }}</td>
+                                <td>{{ form.unit_discount }}</td>
+                                <td>{{ form.total_price }}</td>
+                                <td><button class="btn btn-danger removeRow">Delete</button></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <button id="addRow"  type="button" class="btn btn-primary">Add Row</button>
+        </div>
+        
+    </div>
+    
+
+    <!-- Terms and Conditions -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white" data-bs-toggle="collapse" href="#termsAndConditions" role="button">
+            Terms and Conditions
+        </div>
+        <div class="collapse" id="termsAndConditions">
+            <div class="card-body">
+                <!-- Sample Terms and Conditions text -->
+                <p>
+                    1. The user agrees to use the website and its contents at their own risk. <br>
+                    2. All information on the website is for general information purposes. <br>
+                    3. The website may contain links to external websites, which are not provided by our organization. We do not take responsibility for any external content. <br>
+                    4. Any personal data submitted by the user will be used for the sole purpose of improving the user experience on the website. <br>
+                    ... (and so on)
+                </p>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="agreeToTerms">
+                    <label class="form-check-label" for="agreeToTerms">
+                        I have read and agree to the Terms and Conditions.
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <!-- Submit button -->
+        <div class="form-group">
+            <input type="submit" value="Create" class="btn btn-primary">
+        </div>
+    </form>
+
+<script>var allProducts = {{ all_products|safe }};
+$(document).ready(function() {
+// Add row
+$('#addRow').click(function() {
+    var totalForms = $('#id_lineitems-TOTAL_FORMS').val();
+    var productOptions = allProducts.map(product => `<option value="${product.pk}">${product.fields.name}</option>`).join('');
+    //console.log(allProducts);
+    var newRow = `
+    <tr>
+        <td><select name="lineitems-${totalForms}-product_id">${productOptions}</select></td>
+        <td><input type="text" name="lineitems-${totalForms}-quantity"></td>
+        <td><input type="text" name="lineitems-${totalForms}-unit_discount"></td>
+        <td><input type="text" name="lineitems-${totalForms}-total_price"></td>
+        <td><button class="btn btn-danger removeRow">Delete</button></td>
+    </tr>`;
+
+    $('#lineItems tbody').append(newRow);
+    $('#id_lineitems-TOTAL_FORMS').val(parseInt(totalForms) + 1);
+});
+
+// Remove row
+$('#lineItems').on('click', '.removeRow', function() {
+    $(this).closest('tr').remove();
+    var totalForms = $('#id_form-TOTAL_FORMS').val();
+    $('#id_form-TOTAL_FORMS').val(parseInt(totalForms) - 1);
+});
+});
+
+console.log("Script is running")
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+{% endblock %}
+
