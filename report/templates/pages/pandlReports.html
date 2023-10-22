@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+  <h1>P&L Report</h1>
+  <div>
+    <a href="/dashboard/reports/generate_profit_and_loss" class="btn btn-success">Download PDF</a>
+    <a href="/dashboard/reports/generate_ledger_profit_and_loss" class="btn btn-success">Generate Report</a>
+  </div>
+</div>
+
+<table class="w-full border-collapse border">
+  {% for type in data %}
+  <thead class="bg-gray-300">
+    <tr>
+      <th class="border p-2 w-1/12">{{ forloop.counter }}</th>
+      <th class="border p-2 w-9/12">{{ type.title }}:</th>
+      <th class="border p-2 w-2/12">RM</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for useraccount in type.data %}
+    
+      <tr>
+        <td class="border p-2">{{forloop.counter}}</td>
+        <td class="border p-2">{{useraccount.account.name}}</td>
+        <td class="border p-2">{{useraccount.amount}}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+  {% endfor %}
+  <tbody>
+    <tr>
+      <td class="border h-9"></td>
+      <td class="border"> </td>
+      <td class="border"> </td>
+    </tr>
+    <tr>
+      <td class="border h-9"></td>
+      <td class="border">Total</td>
+      <td class="border">{{total}}</td>
+    </tr>
+  </tbody>
+</table>
+
+
+
+
+<script>
+
+</script>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+  <h1>Inventory Reports</h1>
+  <a href="/dashboard/reports/generate_cash_flow" class="btn btn-success">Download PDF</a>
+</div>
+
+<table class="w-full border-collapse border">
+  <thead class="bg-gray-300">
+    <tr>
+      <th class="border p-2 w-1/12">No.</th>
+      <th class="border p-2 w-3/12">Name</th>
+      <th class="border p-2 w-3/12">Product</th>
+      <th class="border p-2 w-2/12">Price per unit</th>
+      <th class="border p-2 w-4/12">Stock Quantity</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for data in display_data %}
+    <tr>
+      <td class="border p-2">{{forloop.counter}}</td>
+      <td class="border p-2">{{data.name}}</td>
+      <td class="border p-2">{{data.product}}</td>
+      <td class="border p-2">{{data.price_per_unit}}</td>
+      <td class="border p-2">{{data.stock}}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<script>
+
+</script>
+
+</div>
+
+{% endblock %}

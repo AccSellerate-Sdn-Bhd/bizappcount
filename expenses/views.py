@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .models import Expense,ExpenseLineItem,Product
-from .forms import ExpensesForm,ExpensesLineItemsForm,ExpensesLineItemswithIDForm
+from .forms import ExpensesForm,ExpensesLineItemsForm,ExpensesLineItemswithIDForm,ReceiptForm
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.forms import inlineformset_factory
@@ -10,6 +10,9 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.db.models import Sum
 from django.http import FileResponse
+
+from report.models import TransactionAction, Journal
+from user_onboard.models import User
 import generatedoc
 from django.shortcuts import redirect,get_object_or_404
 from rest_framework.decorators import api_view
@@ -59,6 +62,10 @@ def expenses_dashboard(request):
 
 @login_required
 def create_expenses(request):
+    try:
+        user = User.objects.get(username=request.user)
+    except Exception as e:
+        return redirect('/')    
     # Define the formset class
     ExpenseLineItemsFormSet = modelformset_factory(ExpenseLineItem, form=ExpensesLineItemsForm, extra=1)
     all_products = serialize('json', Product.objects.all())
@@ -80,9 +87,9 @@ def create_expenses(request):
                 item_instance.expense_id = expense_instance
                 item_instance.save()
 
-
+            runTransactionAction(expense_instance, user)
             # You should redirect after successful POST (PRG pattern)
-            return redirect("/expenses")
+            return redirect("/dashboard/expenses/")
         else:
             messages.error(request, 'Failed to create expenses entry. Please correct the errors below.')
     else:
@@ -137,7 +144,7 @@ def edit_expenses(request, expenses_id):
     existing_expense = get_object_or_404(Expense, expense_id=expenses_id)
 
     # Define the formset class
-    ExpenseLineItemsFormSet = modelformset_factory(ExpenseLineItem, form=ExpensesLineItemswithIDForm,extra=0)
+    ExpenseLineItemsFormSet = modelformset_factory(ExpenseLineItem, form=ExpensesLineItemsForm,extra=0)
     all_products = serialize('json', Product.objects.all())
 
     if request.method == 'POST':
@@ -160,7 +167,7 @@ def edit_expenses(request, expenses_id):
                 item_instance.save()
 
 
-            return redirect("/expenses")
+            return redirect("/dashboard/expenses")
         else:
             messages.error(request, 'Failed to update expenses entry. Please correct the errors below.')
 
@@ -176,3 +183,97 @@ def edit_expenses(request, expenses_id):
     }
 
     return render(request, 'expenses/edit_template.html', return_value)
+
+
+def generate_purchase_order(request, expenses_id):
+    # Fetch the expense data
+    expense = Expense.objects.get(expense_id=expenses_id)  # Assuming the primary key is id for the Expense model
+    expense_lines = ExpenseLineItem.objects.filter(expense_id=expenses_id)
+
+    # Use a PDF generation library to generate the PDF
+    pdf = generatedoc.generate_professional_purchase_order(expense, expense_lines) # This function should return the binary data for the PDF
+
+    # Return the PDF as a response
+    response = FileResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="purchase_order_{expenses_id}.pdf"'
+
+    return response
+
+
+
+def upload_receipt(request):
+    if request.method == "POST":
+        form = ReceiptForm(request.POST, request.FILES)
+        print(form.errors)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Receipt uploaded successfully!')
+            return redirect('expenses_dashboard')  # This will redirect back to the dashboard after uploading.
+        else:
+            messages.error(request, 'There was a problem uploading the receipt.')
+    else:
+        form = ReceiptForm()
+
+    return redirect('expenses_dashboard')  # If not POST, or if there's an error, just redirect back.
+
+
+def runTransactionAction(expense, user):
+    print("\n\n\n")
+    print(expense.title)
+    title = expense.title
+    datetime = expense.date
+    actions = TransactionAction.objects.filter(expense_title=title, payment="Credit")
+    
+
+    if(len(actions) >0):
+        for action in actions:
+            # Do something with item
+            print(action.name)
+            print(action.account.name)
+            # relationship = AccountUserRelationship.objects.filter(account=action.account, user=user)
+
+            if(action.model == "ExpenseLineItem"):
+                modelExpenseLineItem(expense, datetime, action.datafield, action.operation, user, action.account)
+            elif(action.model == "Product"):
+                modelProduct(expense, datetime, action.datafield, action.operation, user, action.account)
+
+
+def modelExpenseLineItem(expenses, date, field, operation, user, account):
+    expenseLineItems = ExpenseLineItem.objects.filter(expense_id=expenses)
+    amount = 0
+
+    for expenseLineItem in expenseLineItems:
+        amount += float(getattr(expenseLineItem, field))
+
+    new_journal = Journal(
+        account = account,
+        user = user,
+        datetime =  date,
+        name = account.name,
+        debit_amount=amount if operation == 1 else None,
+        credit_amount= None if operation == 1 else amount,
+        description=expenses.title,
+        editable=1
+    )
+
+    new_journal.save()
+
+def modelProduct(expenses, date, field, operation, user, account):
+    expenseLineItems = ExpenseLineItem.objects.filter(expense_id=expenses)
+    amount = 0
+
+    for expenseLineItem in expenseLineItems:
+        amount += float(getattr(expenseLineItem.product_id, field)) * float(expenseLineItem.quantity)
+
+    new_journal = Journal(
+        account = account,
+        user = user,
+        datetime =  date,
+        name = account.name,
+        debit_amount=amount if operation == 1 else None,
+        credit_amount= None if operation == 1 else amount,
+        description=expenses.title,
+        editable=1
+    )
+
+    new_journal.save()

@@ -21,6 +21,7 @@ class InventoryHistory(models.Model):
     inventory = models.ForeignKey(
         Inventory, on_delete=models.CASCADE, null=True, blank=True)
     description = models.CharField(max_length=255, null=True)
+    current_stock = models.FloatField(default=0)
     increase = models.BooleanField()
     amount = models.FloatField() 
     created_at = models.DateTimeField(auto_now_add=True, null=True)

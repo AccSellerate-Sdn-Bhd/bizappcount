@@ -105,7 +105,7 @@
                                 <th>Quantity</th>
                                 <th>Unit Discount</th>
                                 <th>Total Price</th>
-                                <th>Action</th>
+                                <!-- <th>Action</th> -->
                             </tr>
                         </thead>
                         <tbody>
@@ -117,7 +117,7 @@
                                 <td>{{ form.quantity }}</td>
                                 <td>{{ form.unit_discount }}</td>
                                 <td>{{ form.total_price }}</td>
-                                <td><button class="btn btn-danger removeRow">Delete</button></td>
+                                <!-- <td><button class="btn btn-danger removeRow">Delete</button></td> -->
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -185,8 +185,8 @@ $('#addRow').click(function() {
 // Remove row
 $('#lineItems').on('click', '.removeRow', function() {
     $(this).closest('tr').remove();
-    var totalForms = $('#id_form-TOTAL_FORMS').val();
-    $('#id_form-TOTAL_FORMS').val(parseInt(totalForms) - 1);
+    var totalForms = $('#id_lineitems-TOTAL_FORMS').val();
+    $('#id_lineitems-TOTAL_FORMS').val(parseInt(totalForms) - 1);
 });
 });
 

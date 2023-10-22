@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+  <h1>Cash Flow Report</h1>
+  <a href="/dashboard/reports/generate_cash_flow" class="btn btn-success">Download PDF</a>
+</div>
+
+<table class="w-full border-collapse border">
+  <thead class="bg-gray-300">
+    <tr>
+      <th class="border p-2 w-2/12">Cash Received:</th>
+      <th class="border p-2">Janurary</th>
+      <th class="border p-2">February</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="border p-2">Sales Revenue</td>
+      <td class="border p-2">0.00</td>
+      <td class="border p-2">0.00</td>
+    </tr>
+    <tr>
+      <td class="border h-9"></td>
+      <td class="border"> </td>
+      <td class="border"> </td>
+    </tr>
+  </tbody>
+  <thead class="bg-gray-300">
+    <tr>
+      <th class="border p-2">Expenditures:</th>
+      <th class="border p-2"></th>
+      <th class="border p-2"></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="border p-2">Sales Revenue</td>
+      <td class="border p-2">0.00</td>
+      <td class="border p-2">0.00</td>
+    </tr>
+    <tr>
+      <td class="border h-9"></td>
+      <td class="border"> </td>
+      <td class="border"> </td>
+    </tr>
+    <tr>
+      <td class="border p-2">Net Cash Flow</td>
+      <td class="border p-2">0.00</td>
+      <td class="border p-2">0.00</td>
+    </tr>
+    <tr>
+      <td class="border p-2">Ending Cash Balance</td>
+      <td class="border p-2">0.00</td>
+      <td class="border p-2">0.00</td>
+    </tr>
+  </tbody>
+
+
+</table>
+
+<script>
+
+</script>
+
+</div>
+
+{% endblock %}

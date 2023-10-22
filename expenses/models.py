@@ -13,6 +13,7 @@ class Expense(models.Model):
     recurring = models.BooleanField(default=False)  # Using BooleanField for TINYINT
     recurring_date = models.DateTimeField(blank=True, null=True)
     recurring_amount = models.FloatField(blank=True, null=True)
+    payment_type = models.CharField(max_length=255, null=True)
 
     class Meta:
         db_table = 'expenses'
@@ -34,3 +35,9 @@ class ExpenseAttachment(models.Model):
     expense_id = models.ForeignKey(Expense, on_delete=models.DO_NOTHING ,db_column='expense_id', related_name='attachments')
     class Meta:
         db_table = 'expense_attachment'
+
+
+class Receipt(models.Model):
+    file = models.FileField(upload_to='receipts/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    expense_id = models.ForeignKey(Expense, on_delete=models.DO_NOTHING ,db_column='expense_id', related_name='receipts')

@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from .models import Sales,Customer,SalesLineItems,Product,ShippingInformation,SalesFooter
+from report.models import TransactionAction, Journal
+from user_onboard.models import User, Product
 from .forms import SalesForm,CustomerForm,SalesLineItemsForm,ShippingForm,SalesLineItemswithIDForm
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
@@ -118,7 +120,56 @@ def generate_quotation(request, sales_id):
     
     return response
 
+def generate_invoice(request, sales_id):
+    # Fetch the sale data
+    sale = Sales.objects.get(sales_id=sales_id)
+    sale_lines = SalesLineItems.objects.filter(sales_id=sales_id)
+    
+    # Use a PDF generation library to generate the PDF
+    # Here's a pseudo-code for it, you might use libraries like ReportLab, xhtml2pdf, WeasyPrint, etc.
+    pdf = generatedoc.generate_professional_invoice_from_sale(sale,sale_lines) # This function should return the binary data for the PDF
+
+    # Return the PDF as a response
+    response = FileResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="invoice_{sales_id}.pdf"'
+    
+    return response
+
+def generate_do(request, sales_id):
+    # Fetch the sale data
+    sale = Sales.objects.get(sales_id=sales_id)
+    sale_lines = SalesLineItems.objects.filter(sales_id=sales_id)
+    
+    # Use a PDF generation library to generate the PDF
+    # Here's a pseudo-code for it, you might use libraries like ReportLab, xhtml2pdf, WeasyPrint, etc.
+    pdf = generatedoc.generate_professional_delivery_order(sale,sale_lines) # This function should return the binary data for the PDF
+
+    # Return the PDF as a response
+    response = FileResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="do_{sales_id}.pdf"'
+    
+    return response
+
+def generate_receipt(request, sales_id):
+    # Fetch the sale data
+    sale = Sales.objects.get(sales_id=sales_id)
+    sale_lines = SalesLineItems.objects.filter(sales_id=sales_id)
+    
+    # Use a PDF generation library to generate the PDF
+    # Here's a pseudo-code for it, you might use libraries like ReportLab, xhtml2pdf, WeasyPrint, etc.
+    pdf = generatedoc.generate_professional_receipt(sale,sale_lines) # This function should return the binary data for the PDF
+
+    # Return the PDF as a response
+    response = FileResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="receipt_{sales_id}.pdf"'
+    
+    return response
+
 def create_sales(request):
+    try:
+        user = User.objects.get(username=request.user)
+    except Exception as e:
+        return redirect('/')
     # Define the formset class
     SalesLineItemsFormSet = modelformset_factory(SalesLineItems, form=SalesLineItemsForm, extra=1)
     all_products = serialize('json', Product.objects.all())
@@ -139,13 +190,22 @@ def create_sales(request):
                 item_instance = item_form.save(commit=False)
                 item_instance.sales_id = sales_instance
                 item_instance.save()
-
+                
+            runTransactionAction(sales_instance, user)
             ship_instance = shipform.save(commit=False)
             ship_instance.sales_id = sales_instance
             ship_instance.save()
             
+            # TransactionAction(
+            #     sales_title = 
+            #     expense_title = models.CharField(max_length=255, null=True, blank=True)
+            #     account = models.ForeignKey(Account, on_delete=models.DO_NOTHING, db_column='account_id')
+            #     name = models.CharField(max_length=255)
+            #     payment = models.CharField(max_length=255, null=True, blank=True)
+            #     operation = models.BooleanField() 
+            # )
             # You should redirect after successful POST (PRG pattern)
-            return redirect("/sales")
+            return redirect("/dashboard/sales/")
         else:
             messages.error(request, 'Failed to create sales entry. Please correct the errors below.')
     else:
@@ -233,7 +293,7 @@ def edit_sales(request, sales_id):
     existing_sale = get_object_or_404(Sales, sales_id=sales_id)
 
     # Define the formset class
-    SalesLineItemsFormSet = modelformset_factory(SalesLineItems, form=SalesLineItemswithIDForm,extra=0)
+    SalesLineItemsFormSet = modelformset_factory(SalesLineItems, form=SalesLineItemsForm,extra=0)
     all_products = serialize('json', Product.objects.all())
 
     if request.method == 'POST':
@@ -258,7 +318,7 @@ def edit_sales(request, sales_id):
             # Update shipping details
             ship_instance = shipform.save()
 
-            return redirect("/sales")
+            return redirect("/dashboard/sales")
         else:
             messages.error(request, 'Failed to update sales entry. Please correct the errors below.')
 
@@ -287,3 +347,56 @@ def edit_sales_line(request, sales_id):
     else:
         form = SalesForm(instance=sale)
     return render(request, 'sales/edit_template.html', {'form': form})
+
+
+def runTransactionAction(sales, user):
+    print("\n\n\n")
+    print(sales.title)
+    title = sales.title
+    datetime = sales.date
+    actions = TransactionAction.objects.filter(sales_title=title, payment="Cash")
+    # paymenttype = sales.payment_type
+    # actions = TransactionAction.objects.filter(sales_title=title, payment=paymenttype)
+    
+    if(len(actions) >0):
+        for action in actions:
+            # Do something with item
+            print(action.name)
+            print(action.account.name)
+            # relationship = AccountUserRelationship.objects.filter(account=action.account, user=user)
+            if(action.model == "SalesLineItems"):
+                modelSalesLineItems(sales, datetime, action.datafield, action.operation, user, action.account)
+            elif(action.model == "Product"):
+                modelProduct(sales, datetime, action.datafield, action.operation, user, action.account)
+def modelSalesLineItems(sales, date, field, operation, user, account):
+    salesLineItems = SalesLineItems.objects.filter(sales_id=sales)
+    amount = 0
+    for salesLineItem in salesLineItems:
+        amount += float(getattr(salesLineItem, field))
+    new_journal = Journal(
+        account = account,
+        user = user,
+        datetime =  date,
+        name = account.name,
+        debit_amount=amount if operation == 1 else None,
+        credit_amount= None if operation == 1 else amount,
+        description=sales.title,
+        editable=1
+    )
+    new_journal.save()
+def modelProduct(sales, date, field, operation, user, account):
+    salesLineItems = SalesLineItems.objects.filter(sales_id=sales)
+    amount = 0
+    for salesLineItem in salesLineItems:
+        amount += float(getattr(salesLineItem.product_id, field)) * float(salesLineItem.quantity)
+    new_journal = Journal(
+        account = account,
+        user = user,
+        datetime =  date,
+        name = account.name,
+        debit_amount=amount if operation == 1 else None,
+        credit_amount= None if operation == 1 else amount,
+        description=sales.title,
+        editable=1
+    )
+    new_journal.save()

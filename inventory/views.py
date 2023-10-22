@@ -61,7 +61,8 @@ def create(request):
                     inventory=new_inventory,
                     description="Created new inventory",
                     increase=True,
-                    amount=form.cleaned_data['amount']
+                    amount=form.cleaned_data['amount'],
+                    current_stock=form.cleaned_data['amount']
                 )
 
                 new_inventory.save()
@@ -130,7 +131,8 @@ def edit(request, id):
                         inventory=inventory,
                         description="Edited inventory, fields changed: " + editedFieldsString,
                         increase=increase,
-                        amount=amount
+                        amount=amount,
+                        current_stock=form.cleaned_data['amount']
                     )
 
                     functionResult['newInventory'].save()

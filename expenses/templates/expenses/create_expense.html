@@ -50,6 +50,14 @@
 
                     <!-- Right column -->
                     <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="{{ form.payment_type.id_for_label }}" class="form-label">Payment Type</label>
+                            <select class="form-control" id="{{ form.payment_type.id_for_label }}" name="{{ form.payment_type.name }}">
+                                <option value="Cash">Cash</option>
+                                <option value="Credit">Credit</option>
+                            </select>
+
+                        </div>
 
                         <div class="mb-3">
                             <label for="{{ form.due_date.id_for_label }}" class="form-label">Due Date</label>

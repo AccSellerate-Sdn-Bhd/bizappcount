@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+  <h1>Balance Sheet Report</h1>
+  <a href="/dashboard/reports/generate_balance_sheet" class="btn btn-success">Download PDF</a>
+</div>
+
+<table class="border w-full">
+  <thead>
+    <tr>
+      <th colspan="3" class="bg-gray-300 border">Assets</th>
+      <th colspan="3" class="bg-gray-300 border">Liabilities</th>
+    </tr>
+    <tr>
+      <th class="bg-gray-300 border w-1/12">No</th>
+      <th class="bg-gray-300 border w-3/12">Name</th>
+      <th class="bg-gray-300 border w-2/12">Amount (MYR)</th>
+      <th class="bg-gray-300 border w-1/12">No</th>
+      <th class="bg-gray-300 border w-3/12">Name</th>
+      <th class="bg-gray-300 border w-2/12">Amount (MYR)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="border h-7"> </td>
+      <td class="border"> </td>
+      <td class="border"> </td>
+      <td class="border"> </td>
+      <td class="border"> </td>
+      <td class="border"> </td>
+    </tr>
+    <tr>
+      <td class="border"></td>
+      <td class="border underline">Assets</td>
+      <td class="border"></td>
+      <td class="border"></td>
+      <td class="border underline">Current Liabilities</td>
+      <td class="border"></td>
+    </tr>
+    <!-- Add more lines of content -->
+    <tr>
+      <td class="border">1</td>
+      <td class="border">Row 1, Cell 2</td>
+      <td class="border">0.00</td>
+      <td class="border">2</td>
+      <td class="border">Row 1, Cell 2</td>
+      <td class="border">0.00</td>
+    </tr>
+    <tr>
+      <td class="border"></td>
+      <td class="border font-bold">Total Assets</td>
+      <td class="border"></td>
+      <td class="border"></td>
+      <td class="border font-bold">Total Current Liabilities</td>
+      <td class="border"></td>
+    </tr>
+
+    <tr>
+      <td class="border h-7"> </td>
+      <td class="border"> </td>
+      <td class="border"> </td>
+      <td class="border"> </td>
+      <td class="border"> </td>
+      <td class="border"> </td>
+    </tr>
+
+    <tr>
+      <td class="border"></td>
+      <td class="border underline">Fixed Assets</td>
+      <td class="border"></td>
+      <td class="border"></td>
+      <td class="border underline">Equity</td>
+      <td class="border"></td>
+    </tr>
+    <!-- Add more lines of content -->
+    <tr>
+      <td class="border">1</td>
+      <td class="border">Row 1, Cell 2</td>
+      <td class="border">0.00</td>
+      <td class="border">2</td>
+      <td class="border">Row 1, Cell 2</td>
+      <td class="border">0.00</td>
+    </tr>
+    <tr>
+      <td class="border"></td>
+      <td class="border font-bold">Total Fixed Assets</td>
+      <td class="border"></td>
+      <td class="border"></td>
+      <td class="border font-bold">Total Equities</td>
+      <td class="border"></td>
+    </tr>
+
+    <tr>
+      <td class="border h-7"> </td>
+      <td class="border"> </td>
+      <td class="border"> </td>
+      <td class="border"> </td>
+      <td class="border"> </td>
+      <td class="border"> </td>
+    </tr>
+    <tr>
+      <td class="border h-7"> </td>
+      <td class="border"> </td>
+      <td class="border"> </td>
+      <td class="border"> </td>
+      <td class="border"> </td>
+      <td class="border"> </td>
+    </tr>
+
+    <tr>
+      <td class="border"></td>
+      <td class="border font-bold">Total Assets</td>
+      <td class="border"></td>
+      <td class="border"></td>
+      <td class="border font-bold">Total Liabilities and Equities</td>
+      <td class="border"></td>
+    </tr>
+  </tbody>
+</table>
+
+
+<script>
+
+</script>
+
+</div>
+
+{% endblock %}
