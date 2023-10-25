@@ -269,7 +269,7 @@ def seed_data(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('report', '0009_transactionaction_model'),
+        ('report', '0002_initial'),
     ]
 
     operations = [

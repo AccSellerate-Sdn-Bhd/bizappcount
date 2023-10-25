@@ -167,7 +167,7 @@ def seed_data(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('report', '0015_alter_journal_credit_amount_and_more'),
+        ('report', '0011_auto_20231020_2048'),
     ]
 
     operations = [
