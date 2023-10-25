@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'report',
     'dashboard',
     'rest_framework',
-    'inventory'
+    'inventory',
+    'expenses'
 ]
 
 MIDDLEWARE = [
@@ -102,6 +103,7 @@ DATABASES = {
         'ENGINE': 'mysql.connector.django',
         'NAME': 'bacount',
         'USER': 'root',
+
         'PASSWORD': 'Melion@83',
         'HOST': 'localhost',  
         'PORT': '3306',

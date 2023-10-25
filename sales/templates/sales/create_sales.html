@@ -52,22 +52,24 @@
                             <label for="{{ form.delivery_address.id_for_label }}" class="form-label">Delivery</label>
                             <input type="text" class="form-control" id="delivery_address" name="delivery_address" readonly>                              
                         </div>
-                        <div class="mb-3">
-                            <label for="{{ form.date.id_for_label }}" class="form-label">Date</label>
-                            <input type="date" class="form-control" id="{{ form.date.id_for_label }}" name="{{ form.date.name }}" value="{{ form.date.value }}">
-                        </div>
+
                     </div>
 
                     <!-- Right column -->
                     <div class="col-md-6">
 
                         <div class="mb-3">
-                            <label for="{{ form.document_type.id_for_label }}" class="form-label">Document Type</label>
-                            <input type="text" class="form-control" id="{{ form.document_type.id_for_label }}" name="{{ form.document_type.name }}" value="{{ form.document_type.value|default:'' }}">
+                            <label for="{{ form.payment_type.id_for_label }}" class="form-label">Payment Type</label>
+                            <select class="form-control" id="{{ form.payment_type.id_for_label }}" name="{{ form.payment_type.name }}">
+                                <option value="Cash">Cash</option>
+                                <option value="Credit">Credit</option>
+                            </select>
+
                         </div>
+
                         <div class="mb-3">
-                            <label for="{{ form.document_number.id_for_label }}" class="form-label">Document Number</label>
-                            <input type="text" class="form-control" id="{{ form.document_number.id_for_label }}" name="{{ form.document_number.name }}">
+                            <label for="{{ form.date.id_for_label }}" class="form-label">Date</label>
+                            <input type="date" class="form-control" id="{{ form.date.id_for_label }}" name="{{ form.date.name }}" value="{{ form.date.value }}">
                         </div>
                         <div class="mb-3">
                             <label for="{{ form.closing_date.id_for_label }}" class="form-label">Sale Closing Date</label>
@@ -316,7 +318,7 @@
     const customerId = document.getElementById('id_customer_id').value;
 
     if (customerId) {
-        fetch(`/sales/get_customer_data/${customerId}/`)
+        fetch(`/dashboard/sales/get_customer_data/${customerId}/`)
             .then(response => response.json())
             .then(data => {
                 document.getElementById('address').value = data.address || "";
@@ -360,7 +362,7 @@ document.getElementById('id_customer_id').addEventListener('change', function() 
     const customerId = this.value;
 
     if (customerId) {
-        fetch(`/sales/get_customer_data/${customerId}/`)
+        fetch(`/dashboard/sales/get_customer_data/${customerId}/`)
             .then(response => response.json())
             .then(data => {
                 document.getElementById('address').value = data.address || "";

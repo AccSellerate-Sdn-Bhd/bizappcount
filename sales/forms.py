@@ -10,8 +10,8 @@ class SalesForm(forms.ModelForm):
         fields = [
             'sales_id', 'customer_id','title',
             'date',
-            'document_number', 'closing_date', 'status',
-            'recurring', 'recurring_date'
+            'closing_date', 'status',
+            'recurring', 'recurring_date','payment_type'
         ]
 
 class CustomerForm(forms.ModelForm):

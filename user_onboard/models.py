@@ -131,10 +131,10 @@ class Loan(models.Model):
     creditor_address = models.ForeignKey(Address, on_delete=models.CASCADE)
     creditor_phone_no = models.CharField(max_length=255)
     
-    amount = models.FloatField()
-    amount_payable = models.FloatField()
+    amount = models.FloatField(null=True)
+    amount_payable = models.FloatField(null=True)
     interest = models.FloatField()
-    installment_amount = models.FloatField()
+    installment_amount = models.FloatField(null=True)
     not_defined = models.BooleanField()
     recurring = models.BooleanField()
     active = models.BooleanField()
@@ -152,7 +152,7 @@ class SoftwareCost(models.Model):
     software_billing_info = models.CharField(max_length=255)
     company_name = models.CharField(max_length=255)
     billing_duration = models.CharField(max_length=255)
-    amount = models.FloatField()
+    amount = models.FloatField(null=True)
     active = models.BooleanField()
 
     class Meta:

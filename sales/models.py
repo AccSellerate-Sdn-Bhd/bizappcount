@@ -34,6 +34,8 @@ class Sales(models.Model):
     status = models.CharField(max_length=45, null=True, blank=True)
     recurring = models.BooleanField(null=False,default=False)
     recurring_date = models.DateTimeField(null=True, blank=True)
+    payment_type = models.CharField(max_length=255, null=True)
+
 
     class Meta:
         db_table = 'sales'

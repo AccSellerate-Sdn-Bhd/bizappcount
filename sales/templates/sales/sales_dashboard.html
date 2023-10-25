@@ -30,7 +30,7 @@
                     <th>Amount</th>
                     <th>Status</th>
                     <th>Sales Date</th>
-                    <th>Payment Date</th>
+                    <th>Payment Type</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -46,12 +46,15 @@
                     <td>{{ sale.total_amount }}</td>
                     <td>{{ sale.status }}</td>
                     <td>{{ sale.date|date:"Y-m-d" }}</td>
-                    <td>{{ sale.payment_date }}</td>
+                    <td>{{ sale.payment_type }}</td>
                     <td>
                         <!-- Here, you can add buttons or links for specific actions like edit or delete -->
                         <a href="{% url 'edit_sales' sale.sales_id %}" class="btn btn-primary btn-sm">Edit</a>
                         <a href="{% url 'delete_sales' sale.sales_id %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">Delete</a>
                         <a href="{% url 'generate_quotation' sale.sales_id %}" class="btn btn-secondary btn-sm">Quotation</a>
+                        <a href="{% url 'generate_invoice' sale.sales_id %}" class="btn btn-secondary btn-sm">Invoice</a>
+                        <a href="{% url 'generate_do' sale.sales_id %}" class="btn btn-secondary btn-sm">DO</a>
+                        <a href="{% url 'generate_receipt' sale.sales_id %}" class="btn btn-secondary btn-sm">Receipt</a>
                     </td>
                 </tr>
                 {% endfor %}
