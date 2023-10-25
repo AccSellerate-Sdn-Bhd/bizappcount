@@ -101,11 +101,10 @@ WSGI_APPLICATION = 'bizapp.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'mysql.connector.django',
-        'NAME': 'bacount',
+        'NAME': 'bizapp',
         'USER': 'root',
-
-        'PASSWORD': 'Melion@83',
-        'HOST': 'localhost',  
+        'PASSWORD': 'MyNewPass',
+        'HOST': '127.0.0.1',  
         'PORT': '3306',
         'OPTIONS': {
             'charset': 'utf8mb4',
