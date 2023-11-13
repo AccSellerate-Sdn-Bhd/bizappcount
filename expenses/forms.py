@@ -1,5 +1,5 @@
 from django import forms
-from .models import Expense,Product,ExpenseLineItem,Receipt
+from .models import Expense,Product,ExpenseLineItem,Receipt,DO
 
 class ExpensesForm(forms.ModelForm):
     #customer_id = forms.ModelChoiceField(queryset=Customer.objects.all())
@@ -36,4 +36,9 @@ class ExpensesLineItemswithIDForm(forms.ModelForm):
 class ReceiptForm(forms.ModelForm):
     class Meta:
         model = Receipt
+        fields = ['file', 'expense_id']
+
+class DOForm(forms.ModelForm):
+    class Meta:
+        model = DO
         fields = ['file', 'expense_id']

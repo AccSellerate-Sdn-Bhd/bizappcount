@@ -60,8 +60,8 @@ def seed_data(apps, schema_editor):
     )
     inventory = Account.objects.create(
         name="Inventory",
-        type="revenue",
-        parent_acc=revenue
+        type="assets",
+        parent_acc=assets
     )
     account_receivables = Account.objects.create(
         name="Account Receivables",
@@ -89,8 +89,7 @@ def seed_data(apps, schema_editor):
         name="Sales Revenue (BizApp)",
         sales_title="BizApp Sales- with Inventory",
         payment="Cash",
-        model="SalesLineItems",
-        datafield="total_price",
+        model="Product",
         account=cost_of_sales_inventory,
         operation=1
     )
@@ -107,8 +106,7 @@ def seed_data(apps, schema_editor):
         name="Sales Revenue (BizApp)",
         sales_title="BizApp Sales- with Inventory",
         payment="Cash",
-        model="SalesLineItems",
-        datafield="total_price",
+        model="Product",
         account=inventory,
         operation=0
     )
@@ -127,8 +125,7 @@ def seed_data(apps, schema_editor):
         name="Sales Revenue (BizApp)",
         sales_title="BizApp Sales- with Inventory",
         payment="Credit",
-        model="SalesLineItems",
-        datafield="total_price",
+        model="Product",
         account=cost_of_sales_inventory,
         operation=1
     )
@@ -145,8 +142,7 @@ def seed_data(apps, schema_editor):
         name="Sales Revenue (BizApp)",
         sales_title="BizApp Sales- with Inventory",
         payment="Credit",
-        model="SalesLineItems",
-        datafield="total_price",
+        model="Product",
         account=inventory,
         operation=0
     )
@@ -165,8 +161,7 @@ def seed_data(apps, schema_editor):
         name="Sales Revenue (BizApp)",
         sales_title="BizApp - without Inventory",
         payment="Cash",
-        model="SalesLineItems",
-        datafield="total_price",
+        model="Product",
         account=cost_of_sales_dropshipping,
         operation=1
     )
@@ -183,9 +178,8 @@ def seed_data(apps, schema_editor):
         name="Sales Revenue (BizApp)",
         sales_title="BizApp - without Inventory",
         payment="Cash",
-        model="SalesLineItems",
-        datafield="total_price",
-        account=cash_account,
+        model="Product",
+        account=inventory,
         operation=0
     )
 
@@ -203,8 +197,7 @@ def seed_data(apps, schema_editor):
         name="Sales Revenue (BizApp)",
         sales_title="BizApp - without Inventory",
         payment="Credit",
-        model="SalesLineItems",
-        datafield="total_price",
+        model="Product",
         account=cost_of_sales_dropshipping,
         operation=1
     )
@@ -241,8 +234,7 @@ def seed_data(apps, schema_editor):
         name="Sales Revenue (POS BizApp)",
         sales_title="BizApp POS -with Inventory",
         payment="Cash",
-        model="SalesLineItems",
-        datafield="total_price",
+        model="Product",
         account=cost_of_sales_inventory,
         operation=1
     )
@@ -259,17 +251,15 @@ def seed_data(apps, schema_editor):
         name="Sales Revenue (POS BizApp)",
         sales_title="BizApp POS -with Inventory",
         payment="Cash",
-        model="SalesLineItems",
-        datafield="total_price",
+        model="Product",
         account=inventory,
         operation=0
     )
 
-
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('report', '0002_initial'),
+        ('report', '003_alter_transactionaction_account'),
     ]
 
     operations = [

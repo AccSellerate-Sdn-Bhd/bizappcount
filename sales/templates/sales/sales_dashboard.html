@@ -95,7 +95,7 @@
                     <td>{{ sale_line.status }}</td> 
                     <td>
                         <!-- Here, you can add buttons or links for specific actions like edit or delete -->
-                        <a href="{% url 'edit_sales_line' sale_line.sales_line_id %}" class="btn btn-primary btn-sm">Edit</a>
+                        <!-- <a href="{% url 'edit_sales_line' sale_line.sales_line_id %}" class="btn btn-primary btn-sm">Edit</a> -->
                         <a href="{% url 'delete_sales_line' sale_line.sales_line_id %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">Delete</a>
                     </td>
                 </tr>

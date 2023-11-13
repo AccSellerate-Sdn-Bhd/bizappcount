@@ -13,6 +13,7 @@
       <th>Name</th>
       <th>Product</th>
       <th>Amount</th>
+      <th>Unit</th>
       <th>Price Per Unit</th>
       <th>Actions</th>
     </tr>
@@ -24,7 +25,8 @@
       <td>{{ forloop.counter }}</td>
       <td>{{ item.name }}</td>
       <td>{{ item.product.name}}</td>
-      <td>{{ item.amount }} {{ item.unit }}</td>
+      <td>{{ item.amount }}</td>
+      <td>{{ item.unit }}</td>
       <td>{{ item.price_per_unit }}</td>
       <td>
         <!-- Here, you can add buttons or links for specific actions like edit or delete -->

@@ -3,7 +3,15 @@
 {% block content %}
 <div class="d-flex justify-content-between mb-3">
   <h1>Run Trial Balance</h1>
-  <a href="/dashboard/reports/generate_cash_flow" class="btn btn-success">Download PDF</a>
+  <form method="post">
+    {% csrf_token %}
+    <div class="flex flex-row space-x-3">
+      {{form.start_date}}
+      {{form.end_date}}
+      <button class="btn btn-success" type="submit">Generate Report</button>
+      <!-- <a href="/dashboard/reports/generate_cash_flow" class="btn btn-success">Download PDF</a> -->
+    </div>
+  </form>
 </div>
 
 <table class="w-full border-collapse border">
@@ -11,19 +19,19 @@
     <tr>
       <th class="border p-2 w-1/12">Account Number</th>
       <th class="border p-2 w-3/12">Account Name</th>
-      <th class="border p-2 w-2/12">Unadjusted Balance</th>
-      <th class="border p-2 w-2/12">Adjusted Entry</th>
+      <th class="border p-2 w-3/12">Credit</th>
+      <th class="border p-2 w-3/12">Debit</th>
       <th class="border p-2 w-2/12">Adjusted Balance</th>
     </tr>
   </thead>
   <tbody>
-    {% for data in display_data %}
+    {% for ledger in display_data %}
     <tr>
       <td class="border p-2">{{forloop.counter}}</td>
-      <td class="border p-2">{{data.name}}</td>
-      <td class="border p-2">{{data.unadjusted_balance}}</td>
-      <td class="border p-2">{{data.entry}}</td>
-      <td class="border p-2">{{data.adjusted_balance}}</td>
+      <td class="border p-2">{{ledger.account.name}}</td>
+      <td class="border p-2">{{ledger.credit_amount|default:0}}</td>
+      <td class="border p-2">{{ledger.debit_amount|default:0}}</td>
+      <td class="border p-2">{{ledger.balance}}</td>
     </tr>
     {% endfor %}
   </tbody>

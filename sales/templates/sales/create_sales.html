@@ -116,9 +116,14 @@
                         <thead class="table-primary"> <!-- Gives a nice blue shade to header -->
                             <tr>
                                 <th>Product</th>
+                                <th>Description</th>
+                                <th>SKU NO.</th>
+                                <th>UOM (KG/PCS/SET M)</th>
+                                <th>List Price (MYR)</th>
                                 <th>Quantity</th>
                                 <th>Unit Discount</th>
-                                <th>Total Price</th>
+                                <th>Selling Price</th>
+                                <th>Total Selling Price</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -127,8 +132,13 @@
                             {% for form in formset %}
                             <tr>
                                 <td>{{ form.product_id }}</td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td><input type="text" name="lineitems-${0}-listprice"></td>
                                 <td>{{ form.quantity }}</td>
                                 <td>{{ form.unit_discount }}</td>
+                                <td></td>
                                 <td>{{ form.total_price }}</td>
                                 <td><button class="btn btn-danger removeRow">Delete</button></td>
                             </tr>
@@ -329,6 +339,41 @@
         document.getElementById('delivery_address').value = "";
     }
 
+
+    $(document).on('input', 'input[name^="lineitems-"][name$="-listprice"],input[name^="lineitems-"][name$="-quantity"], input[name^="lineitems-"][name$="-unit_discount"]', function() {
+        var row = $(this).closest('tr');
+        var listPrice = parseFloat(row.find('input[name$="-listprice"]').val()) || 0;  // Fetch List Price from its cell
+        var quantity = parseFloat(row.find('input[name$="-quantity"]').val()) || 0;  // Fetch value from Quantity input
+        var unitDiscount = parseFloat(row.find('input[name$="-unit_discount"]').val()) || 0;  // Fetch value from Unit Discount input
+
+        var totalSellingPrice = (listPrice * (100-unitDiscount)/100) * quantity;
+
+        row.find('input[name$="-total_price"]').val(totalSellingPrice.toFixed(2));  // Update the Total Selling Price input
+    });
+
+
+
+    $(document).on('change', 'select[name^="lineitems-"][name$="-product_id"]', function() {
+        var product_id = $(this).val();
+        var row = $(this).closest('tr');
+        
+        $.ajax({
+            url: `/dashboard/sales/get_product_details/${product_id}/`, // adjust the URL as per your configuration
+            method: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                // Fill up the fields with the fetched data
+                row.find('td:eq(1)').text(data.description); // Description
+                row.find('td:eq(2)').text(data.sku);        // SKU
+                row.find('td:eq(3)').text(data.uom);        // UOM
+                // row.find('td:eq(4)').text(data.list_price); // List Price
+                // ... fill up other fields ...
+            },
+            error: function(err) {
+                console.error('Failed to fetch product details:', err);
+            }
+        });
+    });
   
   $(document).ready(function() {
     // Add row
@@ -339,8 +384,13 @@
         var newRow = `
         <tr>
             <td><select name="lineitems-${totalForms}-product_id">${productOptions}</select></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><input type="text" name="lineitems-${totalForms}-listprice"></td>
             <td><input type="text" name="lineitems-${totalForms}-quantity"></td>
             <td><input type="text" name="lineitems-${totalForms}-unit_discount"></td>
+            <td></td>
             <td><input type="text" name="lineitems-${totalForms}-total_price"></td>
             <td><button class="btn btn-danger removeRow">Delete</button></td>
         </tr>`;

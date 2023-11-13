@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+  <h1>{% if edit %} Update {% else %} Create {% endif %} Inventory</h1>
+  <a href="/dashboard/accounts" class="btn btn-success">Go Back</a>
+</div>
+
+<form method="post">
+  {% csrf_token %}
+  <div class="flex">
+    <div class="flex-1">
+      {{form.name.label_tag}}
+      {{form.name}}
+
+      {{ form.account.label_tag }}
+      {{ form.account }}
+
+      {{form.amount.label_tag}}
+      {{form.amount}}
+
+    </div>
+    <div class="flex-1 pl-5">
+
+    </div>
+  </div>
+  {% if form.errors %}
+  <div class="text-red-500">
+    <ul>
+      {% for field, errors in form.errors.items %}
+      {% for error in errors %}
+      <li>{{ error }}</li>
+      {% endfor %}
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+  <div class="flex justify-end mt-5">
+    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md mr-2">{% if edit %} Update {% else %} Create {% endif %}</button>
+  </div>
+</form>
+
+</div>
+
+{% endblock %}

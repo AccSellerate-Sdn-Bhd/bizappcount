@@ -3,10 +3,7 @@ from report.models import Account, TransactionAction
 
 def seed_data(apps, schema_editor):
     #Main accounts
-    expenses = Account.objects.create(
-        name="Expenses",
-        type="expenses",
-    )
+    expenses = Account.objects.filter(name="Expenses").first()
 
     #Child accounts
     bizapp_software = Account.objects.create(

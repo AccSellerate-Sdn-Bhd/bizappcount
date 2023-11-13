@@ -1,4 +1,7 @@
-<header style="background-color: #e2e9f1; padding-top: 5px; height: 60px; padding-bottom: 5px; padding-left: 20px; padding-right: 50px; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 0; right: 0; z-index: 100;">
+{% load i18n %}
+
+<header
+  style="background-color: #e2e9f1; padding-top: 5px; height: 60px; padding-bottom: 5px; padding-left: 20px; padding-right: 50px; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; left: 0; right: 0; z-index: 100;">
   <!-- Left-aligned content -->
   <div style="display: flex; align-items: center;">
     <img src="logo.png" alt="Logo" style="width: 40px; height: auto; margin-right: 10px;">
@@ -6,12 +9,53 @@
   </div>
 
   <!-- Right-aligned content -->
-  <div style="display: flex; align-items: center;"> 
-    <span style="border-style: solid; border-width: 0.1px; border-color: black; margin-right: 15px; height: 20px;"></span>
+  <div style="display: flex; align-items: center;">
+    <!-- Language selector dropdown -->
+    <div style="margin-right: 20px;">
+      <form method="POST" id="language-form">
+        {% csrf_token %}
+        <select name="language" onchange="changeLanguage()">
+          {% get_current_language as current_language %}
+          {% get_available_languages as available_languages %}
+          {% for lang_code, lang_name in available_languages %}
+          <option value="{{ lang_code }}" {% if lang_code == current_language %} selected {% endif %}>
+            {{ lang_name }}
+          </option>
+          {% endfor %}
+        </select>
+      </form>
+    </div>
+    <span
+      style="border-style: solid; border-width: 0.1px; border-color: black; margin-right: 15px; height: 20px;"></span>
     <i class="fas fa-question-circle" style="width: 40px; height: auto; margin-right: 10px;"></i>
     <i class="fas fa-comment" style="width: 40px; height: auto; margin-right: 10px;"></i>
     <i class="fas fa-bell" style="width: 40px; height: auto; margin-right: 10px;"></i>
-    <img src="https://picsum.photos/400/400" alt="Profile" style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px;">
-    <span>{{user}}</span>
+    <img src="https://picsum.photos/400/400" alt="Profile"
+      style="width: 30px; height: 30px; border-radius: 50%; margin-right: 10px;">
+    <span>{{ user }}</span>
   </div>
+
+  <script>
+    function changeLanguage() {
+      var form = document.getElementById('language-form');
+      var selectedLanguage = form.elements['language'].value;
+
+      console.log(selectedLanguage);
+
+      // Make an API call with the selected language using Fetch API
+      fetch('/api/change-language', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',  // Update content type to JSON
+          'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({ language: selectedLanguage })  // Stringify as JSON
+      }).then(async (data) => {
+        results = await data.json();
+
+        console.log(results.data);
+        window.location.href = `/${results.data}/dashboard`;
+      })
+    }
+  </script>
 </header>

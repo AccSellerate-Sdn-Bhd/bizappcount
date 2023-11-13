@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from .models import Expense,ExpenseLineItem,Product
-from .forms import ExpensesForm,ExpensesLineItemsForm,ExpensesLineItemswithIDForm,ReceiptForm
+from .forms import ExpensesForm,ExpensesLineItemsForm,ExpensesLineItemswithIDForm,ReceiptForm,DOForm
+from inventory.models import Inventory, InventoryHistory
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.forms import inlineformset_factory
@@ -19,7 +20,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.parsers import JSONParser
-
+from .serializers import ExpenseSerializer
 
 
 
@@ -217,25 +218,44 @@ def upload_receipt(request):
     return redirect('expenses_dashboard')  # If not POST, or if there's an error, just redirect back.
 
 
+def upload_do(request):
+    if request.method == "POST":
+        form = DOForm(request.POST, request.FILES)
+        print(form)
+        print(form.errors)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'DO uploaded successfully!')
+            return redirect('expenses_dashboard')  # This will redirect back to the dashboard after uploading.
+        else:
+            messages.error(request, 'There was a problem uploading the delivery order.')
+    else:
+        form = DOForm()
+
+    return redirect('expenses_dashboard')  # If not POST, or if there's an error, just redirect back.
+
+
 def runTransactionAction(expense, user):
     print("\n\n\n")
     print(expense.title)
     title = expense.title
     datetime = expense.date
-    actions = TransactionAction.objects.filter(expense_title=title, payment="Credit")
-    
+    actions = TransactionAction.objects.filter(expense_title=title, payment=expense.payment_type)
+    print(actions)
 
     if(len(actions) >0):
         for action in actions:
             # Do something with item
-            print(action.name)
-            print(action.account.name)
+            #print(action.name)
+            #print(action.account.name)
             # relationship = AccountUserRelationship.objects.filter(account=action.account, user=user)
 
             if(action.model == "ExpenseLineItem"):
                 modelExpenseLineItem(expense, datetime, action.datafield, action.operation, user, action.account)
             elif(action.model == "Product"):
                 modelProduct(expense, datetime, action.datafield, action.operation, user, action.account)
+            elif(action.model == "Inventory"):
+                modelInventory(expense, action.operation, user)                
 
 
 def modelExpenseLineItem(expenses, date, field, operation, user, account):
@@ -277,3 +297,44 @@ def modelProduct(expenses, date, field, operation, user, account):
     )
 
     new_journal.save()
+
+
+def modelInventory(expense,  operation, user):
+
+        expensesLineItems = ExpenseLineItem.objects.filter(expense_id=expense)
+
+        for expensesLineItem in expensesLineItems:
+            inventory = Inventory.objects.get(pk=expensesLineItem.product_id.product_id, user=user.user_id)
+
+            editedFieldsString = "Expenses created, " + ("increase" if(operation) else "decrease")
+
+            if (operation):
+                increase = True
+                amount = expensesLineItem.quantity
+                current_stock = inventory.amount + expensesLineItem.quantity
+            else:
+                increase = False
+                amount = abs(expensesLineItem.quantity)
+                current_stock = inventory.amount - expensesLineItem.quantity
+
+            inventory.amount = current_stock
+
+            print("\n a lot of heart")
+            print(expensesLineItem.product_id.product_id)
+            print(amount)
+            print(inventory)
+            print(editedFieldsString)
+            print("\n")
+
+            new_inventory_history = InventoryHistory(
+                inventory=inventory,
+                description=editedFieldsString,
+                increase=increase,
+                amount=amount,
+                current_stock=current_stock
+            )
+
+            inventory.save()
+            new_inventory_history.save()
+
+    

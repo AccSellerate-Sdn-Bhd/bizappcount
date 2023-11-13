@@ -1,96 +1,110 @@
+{% load i18n %}
+{% get_current_language as current_language %}
 <div style="background-color: #211f1f; padding-top: 60px;"
   class="w-1/5 text-white h-screen fixed top-0 left-0 overflow-y-auto">
   <div class="pt-3">
-    <div class="font-bold underline pt-4 pl-4">Menu Utama</div>
+    <div class="font-bold underline pt-4 pl-4">{% trans "Main Menu" %}</div>
     <div class="flex flex-col mb-10 pt-3">
       <div
-        class="flex items-center flex-row text-center h-10 w-full pl-4 {% if url == '/dashboard' %}bg-blue-500{% endif %}">
-        <a class="text-white" href="/dashboard">Dashboard</a>
+        class="flex items-center flex-row text-left h-10 w-full pl-4 {% if url == '/dashboard' %}bg-blue-500{% endif %}">
+        <a class="text-white" href="/dashboard">{% trans "Dashboard" %}</a>
       </div>
       <div
-        class="flex items-center flex-row text-center h-10 w-full pl-4 {% if 'sales' in url %}bg-blue-500{% endif %}">
-        <a class="text-white" href="/dashboard/sales">Jualan</a>
+        class="flex items-center flex-row text-left h-10 w-full pl-4 {% if 'sales' in url %}bg-blue-500{% endif %}">
+        <a class="text-white" href="/dashboard/sales">{% trans "Sales" %}</a>
       </div>
       <div
-        class="flex items-center flex-row text-center h-10 w-full pl-4 {% if 'expenses' in url %}bg-blue-500{% endif %}">
-        <a href="/dashboard/expenses" class="text-white">Perbelanjaran & Kos</a>
+        class="flex items-center flex-row text-left h-10 w-full pl-4 {% if 'expenses' in url %}bg-blue-500{% endif %}">
+        <a href="/dashboard/expenses" class="text-white">{% trans "Expenses & Costs" %}</a>
       </div>
       <div
-        class="flex items-center flex-row text-center h-10 w-full pl-4 {% if '/dashboard/inventory' in url %}bg-blue-500{% endif %}">
-        <a class="text-white" href="/dashboard/inventory">Inventori</a>
+        class="flex items-center flex-row text-left h-10 w-full pl-4 {% if '/dashboard/inventory' in url %}bg-blue-500{% endif %}">
+        <a class="text-white" href="/dashboard/inventory">{% trans "Inventory" %}</a>
       </div>
       <div
-        class="flex items-center flex-row text-center h-10 w-full pl-4 {% if 'placeholder' in url %}bg-blue-500{% endif %}">
-        <a class="text-white">Pembayaran</a>
+        class="flex items-center flex-row text-left h-10 w-full pl-4 {% if 'placeholder' in url %}bg-blue-500{% endif %}">
+        <a class="text-white">{% trans "Payment" %}</a>
       </div>
     </div>
 
-    <div class="font-bold underline pt-2 pl-4">Report</div>
+    <div class="font-bold underline pt-2 pl-4">{% trans "Report" %}</div>
     <div class="flex flex-col mb-10 pt-3">
       <div
-        class="flex items-center flex-row text-center h-10 w-full pl-4 {% if 'run-trial-balance' in url %}bg-blue-500{% endif %}">
-        <a href="/dashboard/reports/run-trial-balance" class="text-white">Run Trial Balance</a>
+        class="flex items-center flex-row text-left h-10 w-full pl-4 {% if 'run-trial-balance' in url %}bg-blue-500{% endif %}">
+        <a href="/dashboard/reports/run-trial-balance" class="text-white">{% trans "Run Trial Balance" %}</a>
       </div>
       <div
-        class="flex items-center flex-row text-center h-10 w-full pl-4 {% if 'cash-flow' in url %}bg-blue-500{% endif %}">
-        <a href="/dashboard/reports/cash-flow" class="text-white">Cash Flow</a>
+        class="flex items-center flex-row text-left h-10 w-full pl-4 {% if 'cash-flow' in url %}bg-blue-500{% endif %}">
+        <a href="/dashboard/reports/cash-flow" class="text-white">{% trans "Cash Flow" %}</a>
       </div>
       <div
-        class="flex items-center flex-row text-center h-10 w-full pl-4 {% if 'balance-sheet' in url %}bg-blue-500{% endif %}">
-        <a href="/dashboard/reports/balance-sheet" class="text-white">Balance Sheet</a>
+        class="flex items-center flex-row text-left h-10 w-full pl-4 {% if 'balance-sheet' in url %}bg-blue-500{% endif %}">
+        <a href="/dashboard/reports/balance-sheet" class="text-white">{% trans "Balance Sheet" %}</a>
       </div>
       <div
-        class="flex items-center flex-row text-center h-10 w-full pl-4 {% if 'general-ledger' in url %}bg-blue-500{% endif %}">
-        <a href="/dashboard/reports/general-ledger" class="text-white">General Ledger</a>
+        class="flex items-center flex-row text-left h-10 w-full pl-4 {% if 'general-ledger' in url %}bg-blue-500{% endif %}">
+        <a href="/dashboard/reports/general-ledger" class="text-white">{% trans "General Ledger" %}</a>
       </div>
       <div
-        class="flex items-center flex-row text-center h-10 w-full pl-4 {% if 'profit-and-loss' in url %}bg-blue-500{% endif %}">
-        <a href="/dashboard/reports/profit-and-loss" class="text-white">P&L</a>
+        class="flex items-center flex-row text-left h-10 w-full pl-4 {% if 'profit-and-loss' in url %}bg-blue-500{% endif %}">
+        <a href="/dashboard/reports/profit-and-loss" class="text-white">{% trans "Profit and Loss" %}</a>
       </div>
       <div
-        class="flex items-center flex-row text-center h-10 w-full pl-4 {% if 'inventory-report' in url %}bg-blue-500{% endif %}">
-        <a href="/dashboard/reports/inventory-report" class="text-white">Inventory Report</a>
+        class="flex items-center flex-row text-left h-10 w-full pl-4 {% if 'inventory-report' in url %}bg-blue-500{% endif %}">
+        <a href="/dashboard/reports/inventory-report" class="text-white">{% trans "Inventory Report" %}</a>
       </div>
     </div>
 
 
-    <div class="font-bold underline pt-2 pl-4">Paparan</div>
+    <div class="font-bold underline pt-2 pl-4">{% trans "Settings" %}</div>
     <div class="flex flex-col mb-10 pt-3">
       <div
-        class="flex items-center flex-row text-center h-10 w-full pl-4 {% if 'placeholder' in url %}bg-blue-500{% endif %}">
-        <a class="text-white">Produk</a>
+        class="flex items-center flex-row text-left h-10 w-full pl-4 {% if 'accounts' in url %}bg-blue-500{% endif %}">
+        <a class="text-white" href="/dashboard/accounts">{% trans "Accounts" %}</a>
       </div>
       <div
-        class="flex items-center flex-row text-center h-10 w-full pl-4 {% if 'placeholder' in url %}bg-blue-500{% endif %}">
-        <a class="text-white">Vendor</a>
+        class="flex items-center flex-row text-left h-10 w-full pl-4 {% if 'placeholder' in url %}bg-blue-500{% endif %}">
+        <a class="text-white">{% trans "Products" %}</a>
       </div>
       <div
-        class="flex items-center flex-row text-center h-10 w-full pl-4 {% if 'placeholder' in url %}bg-blue-500{% endif %}">
-        <a class="text-white">Inventori</a>
+        class="flex items-center flex-row text-left h-10 w-full pl-4 {% if 'vendors' in url %}bg-blue-500{% endif %}">
+        <a class="text-white" href="/dashboard/vendors">{% trans "Vendors" %}</a>
       </div>
       <div
-        class="flex items-center flex-row text-center h-10 w-full pl-4 {% if 'account-setup' in url %}bg-blue-500{% endif %}">
-        <a class="text-white" href="/dashboard/account-setup">Akaun Setup</a>
+        class="flex items-center flex-row text-left h-10 w-full pl-4 {% if 'creditors' in url %}bg-blue-500{% endif %}">
+        <a class="text-white" href="/dashboard/creditors">{% trans "Creditors" %}</a>
       </div>
       <div
-        class="flex items-center flex-row text-center h-10 w-full pl-4 {% if 'placeholder' in url %}bg-blue-500{% endif %}">
-        <a class="text-white">Paparan Company</a>
+        class="flex items-center flex-row text-left h-10 w-full pl-4 {% if 'bills' in url %}bg-blue-500{% endif %}">
+        <a class="text-white" href="/dashboard/bills">{% trans "Bills" %}</a>
       </div>
       <div
-        class="flex items-center flex-row text-center h-10 w-full pl-4 {% if 'placeholder' in url %}bg-blue-500{% endif %}">
-        <a class="text-white">Template Dokumen</a>
+        class="flex items-center flex-row text-left h-10 w-full pl-4 {% if 'placeholder' in url %}bg-blue-500{% endif %}">
+        <a class="text-white">{% trans "Inventory" %}</a>
       </div>
       <div
-        class="flex items-center flex-row text-center h-10 w-full pl-4 {% if 'placeholder' in url %}bg-blue-500{% endif %}">
-        <a class="text-white">Users</a>
+        class="flex items-center flex-row text-left h-10 w-full pl-4 {% if 'account-setup' in url %}bg-blue-500{% endif %}">
+        <a class="text-white" href="/dashboard/account-setup">{% trans "Account Setup" %}</a>
       </div>
       <div
-        class="flex items-center flex-row text-center h-10 w-full pl-4 {% if 'placeholder' in url %}bg-blue-500{% endif %}">
-        <a class="text-white">Billing</a>
+        class="flex items-center flex-row text-left h-10 w-full pl-4 {% if 'placeholder' in url %}bg-blue-500{% endif %}">
+        <a class="text-white">{% trans "Company Settings" %}</a>
       </div>
       <div
-        class="flex items-center flex-row text-center h-10 w-full pl-4 {% if 'placeholder' in url %}bg-blue-500{% endif %}">
-        <a class="text-white" href="/">Logout</a>
+        class="flex items-center flex-row text-left h-10 w-full pl-4 {% if 'placeholder' in url %}bg-blue-500{% endif %}">
+        <a class="text-white">{% trans "Document Templates" %}</a>
+      </div>
+      <div
+        class="flex items-center flex-row text-left h-10 w-full pl-4 {% if 'placeholder' in url %}bg-blue-500{% endif %}">
+        <a class="text-white">{% trans "Users" %}</a>
+      </div>
+      <div
+        class="flex items-center flex-row text-left h-10 w-full pl-4 {% if 'placeholder' in url %}bg-blue-500{% endif %}">
+        <a class="text-white">{% trans "Billing" %}</a>
+      </div>
+      <div
+        class="flex items-center flex-row text-left h-10 w-full pl-4 {% if 'placeholder' in url %}bg-blue-500{% endif %}">
+        <a class="text-white" href="/">{% trans "Log out" %}</a>
       </div>
     </div>
   </div>

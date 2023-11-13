@@ -4,7 +4,7 @@ from inventory.models import Inventory, InventoryHistory
 from django.http import JsonResponse, HttpResponse
 import io
 from django.http import FileResponse
-from report.models import Journal, Ledger, AccountUserRelationship
+from report.models import Journal, Ledger, AccountUserRelationship, Account
 from django.db.models import F
 from django.db.models import Count
 from operator import itemgetter
@@ -19,9 +19,32 @@ from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
 from datetime import datetime as DateFunction
 from django.core import serializers
+from urllib.parse import unquote
 from io import BytesIO
+from datetime import datetime
+
+
+from .forms import FilterForm
 
 # Create your views here.
+
+
+def monthToNumber(month_name):
+    month_dict = {
+        'January': 1,
+        'February': 2,
+        'March': 3,
+        'April': 4,
+        'May': 5,
+        'June': 6,
+        'July': 7,
+        'August': 8,
+        'September': 9,
+        'October': 10,
+        'November': 11,
+        'December': 12
+    }
+    return month_dict.get(month_name, None)
 
 
 def pandlreports(request):
@@ -30,8 +53,22 @@ def pandlreports(request):
     except Exception as e:
         return redirect('/')
 
+    form = FilterForm()
+
+    if request.method == 'POST':
+        form = FilterForm(request.POST)
+
+        if form.is_valid():
+            start_date = str(form.cleaned_data['start_date'])
+            end_date = str(form.cleaned_data['end_date'])
+
+            date_format = "%Y-%m-%d"
+            start = DateFunction.strptime(start_date, date_format)
+            end = DateFunction.strptime(end_date, date_format)
+            
+            convertLedgerToAccounts(start, end, user)
+
     accounts = AccountUserRelationship.objects.filter(user=user.user_id)
-    # print(ledgers, len(ledgers))
 
     data = []
     total = 0
@@ -39,10 +76,10 @@ def pandlreports(request):
     if (len(accounts) > 0):
         types = []
         for useraccount in accounts:
-            print(useraccount.account.type)
 
             if useraccount.account.type in types:
-                type_object = next((item for item in data if item["title"] == useraccount.account.type), None)
+                type_object = next(
+                    (item for item in data if item["title"] == useraccount.account.type), None)
                 new_array = type_object["data"]
                 new_array.append(useraccount)
                 type_object["data"] = new_array
@@ -54,19 +91,24 @@ def pandlreports(request):
                     "data": [useraccount]
                 }
                 data.append(newObject)
-            
+
             total = total + useraccount.amount
-        
-    print(data)
 
-    return render(request, 'pages/pandlReports.html', {"url": "/dashboard/reports/profit-and-loss", "data": data, "total": total})
+    return render(request, 'pages/pandlReports.html', {
+        "url": "/dashboard/reports/profit-and-loss",
+        "form": form,
+        "data": data,
+        "total": total
+    })
 
 
-def getpandlreportsdata(request):
+def convertToLedger(request, url):
     try:
         user = User.objects.get(username=request.user)
     except Exception as e:
         return redirect('/')
+
+    url = unquote(url)
 
     journals = Journal.objects.filter(editable=1, user=user.user_id)
     currentime = DateFunction.now()
@@ -74,7 +116,6 @@ def getpandlreportsdata(request):
     balance = 0
 
     for journal in journals:
-        print(journal)
         balance = balance - \
             float(journal.credit_amount) if journal.debit_amount == None else balance + \
             float(journal.debit_amount)
@@ -83,7 +124,7 @@ def getpandlreportsdata(request):
             account=journal.account,
             journal=journal,
             user=user,
-            datetime=currentime,
+            datetime=journal.datetime,
             name=journal.name,
             description=journal.description,
             debit_amount=journal.debit_amount,
@@ -91,18 +132,22 @@ def getpandlreportsdata(request):
             balance=balance
         )
 
-        useraccount = AccountUserRelationship.objects.filter(user=user.user_id, account=journal.account.account_id)
-        if(len(useraccount)>0):
+        useraccount = AccountUserRelationship.objects.filter(
+            user=user.user_id, account=journal.account.account_id)
+        if (len(useraccount) > 0):
             olduseraccount = useraccount.first()
 
-            new_amount= float(olduseraccount.amount) - float(journal.credit_amount) if journal.debit_amount == None else float(olduseraccount.amount) +  journal.debit_amount
+            new_amount = float(olduseraccount.amount) - float(
+                journal.credit_amount) if journal.debit_amount == None else float(olduseraccount.amount) + journal.debit_amount
             olduseraccount.amount = new_amount
             olduseraccount.save()
         else:
             newuseraccount = AccountUserRelationship(
                 user=user,
                 account=journal.account,
-                amount= -float(journal.credit_amount) if journal.debit_amount == None else journal.debit_amount
+                amount=-
+                float(
+                    journal.credit_amount) if journal.debit_amount == None else journal.debit_amount
             )
             newuseraccount.save()
 
@@ -110,7 +155,46 @@ def getpandlreportsdata(request):
         journal.save()
         ledger.save()
 
-    return redirect('/dashboard/reports/profit-and-loss')
+    return redirect('/dashboard/reports/' + url)
+
+
+def convertLedgerToAccounts(start_date, end_date, user):
+
+    ledgers = Ledger.objects.filter(
+        datetime__gte=start_date,
+        datetime__lt=end_date
+    )
+
+    print(ledgers)
+    resetAccounts(user)
+
+    for ledger in ledgers:
+        useraccount = AccountUserRelationship.objects.filter(
+            user=user.user_id, account=ledger.account.account_id)
+        if (len(useraccount) > 0):
+            olduseraccount = useraccount.first()
+
+            new_amount = float(olduseraccount.amount) - float(
+                ledger.credit_amount) if ledger.debit_amount == None else float(olduseraccount.amount) + ledger.debit_amount
+            olduseraccount.amount = new_amount
+            olduseraccount.save()
+        else:
+            newuseraccount = AccountUserRelationship(
+                user=user,
+                account=ledger.account,
+                amount=-
+                float(
+                    ledger.credit_amount) if ledger.debit_amount == None else ledger.debit_amount
+            )
+            newuseraccount.save()
+
+
+def resetAccounts(user):
+    useraccounts = AccountUserRelationship.objects.filter(user=user.user_id)
+
+    for account in useraccounts:
+        account.amount = 0
+        account.save()
 
 
 def generate_profit_and_loss_report(request):
@@ -132,8 +216,146 @@ def generate_profit_and_loss_report(request):
     return response
 
 
+def getData(account_name, user):
+    parent_acc = Account.objects.get(name=account_name)
+    child_accounts = Account.objects.filter(parent_acc_id=parent_acc)
+    total = 0
+
+    data = []
+    for acc in child_accounts:
+        ledgers = Ledger.objects.filter(
+            account_id=acc.account_id, user=user.user_id)
+        data = data + list(ledgers)
+        for ledger in ledgers:
+            total = total + (float(ledger.credit_amount)
+                             if ledger.credit_amount is not None else -float(ledger.debit_amount))
+
+    aggregated_data = {}
+
+    for ledger in data:
+        name = ledger.name
+        amount = float(
+            ledger.credit_amount) if ledger.credit_amount is not None else -float(ledger.debit_amount)
+
+        # Check if the name already exists in the aggregated data
+        if name in aggregated_data:
+            # If it does, add the amount to the existing total
+            aggregated_data[name] += amount
+        else:
+            # If it doesn't, create a new entry
+            aggregated_data[name] = amount
+
+    # Convert the aggregated data back to a list of objects
+    result = [{'name': name, 'amount': amount}
+              for name, amount in aggregated_data.items()]
+
+    newObject = {
+        "title": account_name,
+        "data": result,
+        "total": total
+    }
+
+    return newObject
+
+
+def getBalanceSheetData(user):
+    accounts = AccountUserRelationship.objects.filter(user=user.user_id)
+    data = []
+    total = 0
+
+    if (len(accounts) > 0):
+        types = []
+        for useraccount in accounts:
+            acc_array = ["assets", "fixed assets", "liabilities", "equity"]
+            if useraccount.account.type in acc_array:
+                if useraccount.account.type in types:
+                    type_object = next(
+                        (item for item in data if item["title"] == useraccount.account.type), None)
+                    new_array = type_object["data"]
+                    new_array.append(useraccount)
+                    type_object["data"] = new_array
+
+                else:
+                    types.append(useraccount.account.type)
+                    newObject = {
+                        "title": useraccount.account.type,
+                        "data": [useraccount]
+                    }
+                    data.append(newObject)
+
+                total = total + useraccount.amount
+
+    return data
+
+
+def getAccount(data, title):
+    found_object = None
+    for obj in data:
+        if obj["title"] == title:
+            found_object = obj
+            break
+
+    if found_object is not None:
+        total = 0
+        for obj in found_object['data']:
+            total = total + obj.amount
+        return {
+            "title": found_object['title'],
+            "data": found_object['data'],
+            "total": total
+        }
+    else:
+        return {
+            "title": title,
+            "data": [],
+            "total": 0
+        }
+
+
 def balancesheetreports(request):
-    return render(request, 'pages/balancesheetReports.html', {"url": "/dashboard/reports/balance-sheet"})
+    try:
+        user = User.objects.get(username=request.user)
+    except Exception as e:
+        return redirect('/')
+
+    form = FilterForm()
+
+    if request.method == 'POST':
+        form = FilterForm(request.POST)
+
+        if form.is_valid():
+            start_date = str(form.cleaned_data['start_date'])
+            end_date = str(form.cleaned_data['end_date'])
+
+            date_format = "%Y-%m-%d"
+            start = DateFunction.strptime(start_date, date_format)
+            end = DateFunction.strptime(end_date, date_format)
+
+            convertLedgerToAccounts(start, end, user)
+
+    displaydata = getBalanceSheetData(user)
+
+    print("\n\n\n\n\n")
+    assets = getAccount(displaydata, "assets")
+    liabilities = getAccount(displaydata, "liabilities")
+    fixed_assets = getAccount(displaydata, "fixed assets")
+    equity = getAccount(displaydata, "equity")
+
+    compareAssetLiabilities = len(assets['data']) > len(liabilities['data'])
+    compareFixedAssetsEquity = len(fixed_assets['data']) > len(equity['data'])
+
+    return render(request, 'pages/balancesheetReports.html', {
+        "url": "/dashboard/reports/balance-sheet",
+        "form": form,
+        "assets": assets,
+        "liabilities": liabilities,
+        "compareAssetLiabilities": compareAssetLiabilities,
+        "totalAssets": float(assets['total']) + float(fixed_assets['total']),
+        "fixed_assets": fixed_assets,
+        "equity": equity,
+        "compareFixedAssetsEquity": compareFixedAssetsEquity,
+        "totalLiabilities": float(equity['total']) + float(liabilities['total'])
+    })
 
 
 def generate_balance_sheet_report(request):
@@ -182,29 +404,79 @@ def generate_balance_sheet_report(request):
 
 
 def cashflowreports(request):
+    try:
+        user = User.objects.get(username=request.user)
+    except Exception as e:
+        return redirect('/')
 
-    display_data = processDataCashFlow()
+    form = FilterForm()
+
+    if request.method == 'POST':
+        form = FilterForm(request.POST)
+
+        if form.is_valid():
+            start_date = str(form.cleaned_data['start_date'])
+            end_date = str(form.cleaned_data['end_date'])
+
+            date_format = "%Y-%m-%d"
+            start = DateFunction.strptime(start_date, date_format)
+            end = DateFunction.strptime(end_date, date_format)
+
+            convertLedgerToAccounts(start, end, user)
+
+    displaydata = getCashFlowData(user)
+
+    print("\n\n\n\n\n")
+    revenues = getAccount(displaydata, "revenue")
+    expenses = getAccount(displaydata, "expenses")
+
+    net_cash_flow = 0
+    ending_balance = 0
+
+    for revenue in revenues['data']:
+        net_cash_flow = net_cash_flow + float(revenue.amount)
+        ending_balance = ending_balance + float(revenue.amount)
+
+    for expense in expenses['data']:
+        net_cash_flow = net_cash_flow - float(expense.amount)
+        ending_balance = ending_balance - float(expense.amount)
 
     return render(request, 'pages/cashflowReports.html', {
         "url": "/dashboard/reports/cash-flow",
-        'display_data': display_data
+        "form": form,
+        'revenues': revenues,
+        "expenses": expenses,
+        "net_cash_flow": net_cash_flow,
+        "ending_balance": ending_balance
     })
 
 
-def processDataCashFlow():
+def getCashFlowData(user):
+    accounts = AccountUserRelationship.objects.filter(user=user.user_id)
     data = []
+    total = 0
 
-    # Cash received
-    cashreceived = []
-    cashreceived.append(["name", 0, 0, 0])
-    cashreceived.append(["name 2", 0, 0, 0])
-    data.append(cashreceived)
+    if (len(accounts) > 0):
+        types = []
+        for useraccount in accounts:
+            acc_array = ["revenue", "expenses"]
+            if useraccount.account.type in acc_array:
+                if useraccount.account.type in types:
+                    type_object = next(
+                        (item for item in data if item["title"] == useraccount.account.type), None)
+                    new_array = type_object["data"]
+                    new_array.append(useraccount)
+                    type_object["data"] = new_array
 
-    # Expenditures
-    expenditures = []
-    expenditures.append(["name", 0, 0, 0])
-    expenditures.append(["name 2", 0, 0, 0])
-    data.append(expenditures)
+                else:
+                    types.append(useraccount.account.type)
+                    newObject = {
+                        "title": useraccount.account.type,
+                        "data": [useraccount]
+                    }
+                    data.append(newObject)
+
+                total = total + useraccount.amount
 
     return data
 
@@ -229,26 +501,36 @@ def generate_cash_flow_report(request):
 
 
 def runtrialbalancereports(request):
+    try:
+        user = User.objects.get(username=request.user)
+    except Exception as e:
+        return redirect('/')
 
-    display_data = processDataRunTrialBalance()
-    return render(request, 'pages/runTrialBalanceReports.html', {"url": "/dashboard/reports/run-trial-balance", "display_data": display_data})
+    ledgers = Ledger.objects.filter(user=user.user_id)
 
+    form = FilterForm()
 
-def processDataRunTrialBalance():
-    data = []
-    data.append({
-        'name': "Account name goes here",
-        'unadjusted_balance': 100,
-        'entry': 0,
-        'adjusted_balance': 90
+    if request.method == 'POST':
+        form = FilterForm(request.POST)
+
+        if form.is_valid():
+            start_date = str(form.cleaned_data['start_date'])
+            end_date = str(form.cleaned_data['end_date'])
+
+            date_format = "%Y-%m-%d"
+            start = DateFunction.strptime(start_date, date_format)
+            end = DateFunction.strptime(end_date, date_format)
+
+            ledgers = Ledger.objects.filter(
+                datetime__gte=start,
+                datetime__lt=end
+            )
+
+    return render(request, 'pages/runTrialBalanceReports.html', {
+        "url": "/dashboard/reports/run-trial-balance",
+        "display_data": ledgers,
+        "form": form
     })
-    data.append({
-        'name': "Account name goes here 2",
-        'unadjusted_balance': 100,
-        'entry': 0,
-        'adjusted_balance': 90
-    })
-    return data
 
 
 def generate_run_trial_balance(request):
@@ -271,7 +553,36 @@ def generate_run_trial_balance(request):
 
 
 def generalledgerreports(request):
-    return render(request, 'pages/generalLedgerReports.html', {"url": "/dashboard/reports/general-ledger"})
+    try:
+        user = User.objects.get(username=request.user)
+    except Exception as e:
+        return redirect('/')
+
+    ledgers = Ledger.objects.filter(user=user.user_id)
+
+    form = FilterForm()
+
+    if request.method == 'POST':
+        form = FilterForm(request.POST)
+
+        if form.is_valid():
+            start_date = str(form.cleaned_data['start_date'])
+            end_date = str(form.cleaned_data['end_date'])
+
+            date_format = "%Y-%m-%d"
+            start = DateFunction.strptime(start_date, date_format)
+            end = DateFunction.strptime(end_date, date_format)
+
+            ledgers = Ledger.objects.filter(
+                datetime__gte=start,
+                datetime__lt=end
+            )
+
+    return render(request, 'pages/generalLedgerReports.html', {
+        "url": "/dashboard/reports/general-ledger",
+        "ledgers": ledgers,
+        "form": form
+    })
 
 
 def generate_general_ledger_reports(request):
@@ -311,13 +622,12 @@ def processDataInventory(inventories):
     for inventory in inventories:
         histories = InventoryHistory.objects.filter(inventory=inventory)
 
-        for history in histories:
-            data.append({
-                'name': inventory.name,
-                'product': inventory.product.name,
-                'price_per_unit': inventory.price_per_unit,
-                'stock': history.current_stock
-            })
+        data.append({
+            'name': inventory.name,
+            'product': inventory.product.name,
+            'price_per_unit': inventory.price_per_unit,
+            'stock': inventory.amount
+        })
 
     return data
 

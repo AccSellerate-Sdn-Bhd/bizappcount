@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+  <h1>{% if edit %} Edit {%else%} Create {%endif%}Vendor</h1>
+  <a href="/dashboard/vendors" class="btn btn-success">Go Back</a>
+</div>
+
+<form method="post">
+  {% csrf_token %}
+  <div class="flex">
+    <div class="flex-1">
+      {{form.customer_id.label_tag}}
+      {{form.customer_id}}
+
+      {{form.name.label_tag}}
+      {{form.name}}
+
+      {{ form.company.label_tag }}
+      {{ form.company }}
+
+      {{form.email.label_tag}}
+      {{form.email}}
+
+      {{form.phone.label_tag}}
+      {{form.phone}}
+
+      {{form.tax.label_tag}}
+      {{form.tax}}
+
+      <div style="display: flex; justify-content: space-between;">
+        <div style="flex: 1;" class="pr-2">
+          {{form.unit.label_tag}}
+          {{form.unit}}
+        </div>
+        <div style="flex: 1;">
+          {{form.price_per_unit.label_tag}}
+          {{form.price_per_unit}}
+        </div>
+      </div>
+
+    </div>
+    <div class="flex-1 pl-5">
+      {{form.address.label_tag}}
+      {{form.address}}
+
+      {{form.delivery_address.label_tag}}
+      {{form.delivery_address}}
+
+      {{form.website.label_tag}}
+      {{form.website}}
+
+      {{form.linkedIn.label_tag}}
+      {{form.linkedIn}}
+
+      {{form.facebook.label_tag}}
+      {{form.facebook}}
+
+      {{form.tiktok.label_tag}}
+      {{form.tiktok}}
+    </div>
+  </div>
+  {% if form.errors %}
+  <div class="text-red-500">
+    <ul>
+      {% for field, errors in form.errors.items %}
+      {% for error in errors %}
+      <li>{{ error }}</li>
+      {% endfor %}
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+  <div class="flex justify-end mt-5">
+    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md mr-2">{% if edit %} Update {% else %}
+      Create {% endif %}</button>
+  </div>
+</form>
+
+{% endblock %}

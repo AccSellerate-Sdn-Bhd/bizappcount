@@ -1,5 +1,7 @@
 from django.db import models
-from user_onboard.models import Address, Business, User ,Product
+from user_onboard.models import User
+from sales.models import Sales
+from expenses.models import Expense
 
 class Account(models.Model):
     account_id = models.AutoField(primary_key=True, max_length=255)
@@ -23,7 +25,7 @@ class TransactionAction(models.Model):
     action_id = models.AutoField(primary_key=True, max_length=255)
     sales_title = models.CharField(max_length=255, null=True, blank=True)
     expense_title = models.CharField(max_length=255, null=True, blank=True)
-    account = models.ForeignKey(Account, on_delete=models.DO_NOTHING, db_column='account_id')
+    account = models.ForeignKey(Account, on_delete=models.DO_NOTHING, db_column='account_id', null=True)
     
     # to determine which data to use to update
     model = models.CharField(max_length=255, null=True, blank=True)
@@ -47,6 +49,9 @@ class Journal(models.Model):
     credit_amount = models.FloatField(null=True)
     description = models.CharField(max_length=255, null=True, blank=True)
     editable = models.BooleanField(default=True)
+    sales_id = models.ForeignKey(Sales, on_delete=models.DO_NOTHING, db_column='sales_id', null=True)
+    expense_id = models.ForeignKey(Expense, on_delete=models.DO_NOTHING, db_column='expense_id', null=True)
+    type = models.CharField(max_length=25, null=True ,default=None)
 
     class Meta:
         db_table = 'journal'

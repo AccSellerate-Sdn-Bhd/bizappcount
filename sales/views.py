@@ -1,7 +1,8 @@
 from django.shortcuts import render
-from .models import Sales,Customer,SalesLineItems,Product,ShippingInformation,SalesFooter
-from report.models import TransactionAction, Journal
+from .models import Sales,Stakeholder,SalesLineItems,Product,ShippingInformation,SalesFooter
+from report.models import TransactionAction, Journal, Account
 from user_onboard.models import User, Product
+from inventory.models import Inventory, InventoryHistory
 from .forms import SalesForm,CustomerForm,SalesLineItemsForm,ShippingForm,SalesLineItemswithIDForm
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
@@ -68,7 +69,7 @@ def add_customer_api(request):
         tiktok = data.get('tiktok')
 
         if customer_id and name:
-            customer = Customer(
+            customer = Stakeholder(
                 customer_id=customer_id,
                 name=name,
                 company=company,
@@ -80,8 +81,11 @@ def add_customer_api(request):
                 website=website,
                 linkedin=linkedin,
                 facebook=facebook,
-                tiktok=tiktok
+                tiktok=tiktok,
+                user_id=request.user.id,
+                type="Customer"
             )
+
             customer.save()
             return JsonResponse({"success": True}, status=201)
         else:
@@ -89,10 +93,11 @@ def add_customer_api(request):
 
     return JsonResponse({"success": False, "error": "Invalid request method"}, status=400)
 
-
+@login_required
 def sales_dashboard(request):
-    sales = Sales.objects.annotate(total_amount=Sum('line_items__total_price'))
-    sales_line_data = SalesLineItems.objects.all()
+    user_id = request.user.user_id 
+    sales = Sales.objects.filter(user_id=user_id).annotate(total_amount=Sum('line_items__total_price'))
+    sales_line_data = SalesLineItems.objects.all().order_by('sales_id')
 
 
     context = {
@@ -191,10 +196,11 @@ def create_sales(request):
                 item_instance.sales_id = sales_instance
                 item_instance.save()
                 
-            runTransactionAction(sales_instance, user)
             ship_instance = shipform.save(commit=False)
             ship_instance.sales_id = sales_instance
             ship_instance.save()
+
+            runTransactionAction(sales_instance, user)
             
             # TransactionAction(
             #     sales_title = 
@@ -224,11 +230,25 @@ def create_sales(request):
     return render(request, 'sales/create_sales.html', return_value)
 
 
+def get_product_details(request, product_id):
+    product = Product.objects.get(pk=product_id)
+    data = {
+        'description': product.description,
+        'sku': product.SKU,
+        'list_price': product.cost
+    }
+    return JsonResponse(data)
+
 def add_customer(request):
         if request.method == 'POST':
             form = CustomerForm(request.POST)
             if form.is_valid():
-                form.save()
+                customer_instance = form.save(commit=False)
+                print(form.cleaned_data)
+                customer_instance.user_id = request.user
+                customer_instance.type = "Customer"
+                customer_instance.save()
+
                 return JsonResponse({"success": True})
             else:
                 # Return the form errors in the response if needed
@@ -238,13 +258,13 @@ def add_customer(request):
 
 def get_customer_data(request, customer_id):
     try:
-        customer = Customer.objects.get(pk=customer_id)
+        customer = Stakeholder.objects.get(pk=customer_id)
         data = {
             "address": customer.address,
             "delivery_address": customer.delivery_address,
         }
         return JsonResponse(data)
-    except Customer.DoesNotExist:
+    except Stakeholder.DoesNotExist:
         return JsonResponse({}, status=404)
 
 
@@ -354,20 +374,37 @@ def runTransactionAction(sales, user):
     print(sales.title)
     title = sales.title
     datetime = sales.date
-    actions = TransactionAction.objects.filter(sales_title=title, payment="Cash")
+    actions = TransactionAction.objects.filter(sales_title=title, payment=sales.payment_type)
     # paymenttype = sales.payment_type
     # actions = TransactionAction.objects.filter(sales_title=title, payment=paymenttype)
     
     if(len(actions) >0):
         for action in actions:
-            # Do something with item
-            print(action.name)
-            print(action.account.name)
-            # relationship = AccountUserRelationship.objects.filter(account=action.account, user=user)
             if(action.model == "SalesLineItems"):
                 modelSalesLineItems(sales, datetime, action.datafield, action.operation, user, action.account)
             elif(action.model == "Product"):
-                modelProduct(sales, datetime, action.datafield, action.operation, user, action.account)
+                modelProduct(sales, datetime, action.operation, user, action.account)
+            elif(action.model == "Inventory"):
+                modelInventory(sales, action.operation, user)
+    
+    print("\n")
+    print(sales)
+    print(sales.sales_id)
+
+    shippingInfo = ShippingInformation.objects.get(sales_id=sales.sales_id)
+    shippingAccount = Account.objects.get(name="Shipping Revenue")
+    new_journal = Journal(
+        account = shippingAccount,
+        user = user,
+        datetime = datetime,
+        name = shippingAccount.name,
+        debit_amount=shippingInfo.pricing,
+        credit_amount= None,
+        description=sales.title,
+        editable=1
+    )
+    new_journal.save()
+
 def modelSalesLineItems(sales, date, field, operation, user, account):
     salesLineItems = SalesLineItems.objects.filter(sales_id=sales)
     amount = 0
@@ -384,11 +421,15 @@ def modelSalesLineItems(sales, date, field, operation, user, account):
         editable=1
     )
     new_journal.save()
-def modelProduct(sales, date, field, operation, user, account):
+
+def modelProduct(sales, date, operation, user, account):
     salesLineItems = SalesLineItems.objects.filter(sales_id=sales)
     amount = 0
+
     for salesLineItem in salesLineItems:
-        amount += float(getattr(salesLineItem.product_id, field)) * float(salesLineItem.quantity)
+        product = Product.objects.get(pk=salesLineItem.product_id.product_id)
+        amount += float(product.cost) * float(salesLineItem.quantity)
+
     new_journal = Journal(
         account = account,
         user = user,
@@ -400,3 +441,44 @@ def modelProduct(sales, date, field, operation, user, account):
         editable=1
     )
     new_journal.save()
+
+def modelInventory(sales,  operation, user):
+    try:
+        salesLineItems = SalesLineItems.objects.filter(sales_id=sales)
+
+        for salesLineItem in salesLineItems:
+            inventory = Inventory.objects.get(pk=salesLineItem.product_id.product_id, user=user.user_id)
+
+            editedFieldsString = "Sales created, " + ("increase" if(operation) else "decrease")
+
+            if (operation):
+                increase = True
+                amount = salesLineItem.quantity
+                current_stock = inventory.amount + salesLineItem.quantity
+            else:
+                increase = False
+                amount = abs(salesLineItem.quantity)
+                current_stock = inventory.amount - salesLineItem.quantity
+
+            inventory.amount = current_stock
+
+            print("\n a lot of heart")
+            print(salesLineItem.product_id.product_id)
+            print(amount)
+            print(inventory)
+            print(editedFieldsString)
+            print("\n")
+
+            new_inventory_history = InventoryHistory(
+                inventory=inventory,
+                description=editedFieldsString,
+                increase=increase,
+                amount=amount,
+                current_stock=current_stock
+            )
+
+            inventory.save()
+            new_inventory_history.save()
+    except Exception as e:
+        return
+    

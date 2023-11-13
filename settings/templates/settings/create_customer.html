@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .form-group {
+      margin-bottom: 15px;
+    }
+    input[type="text"], input[type="email"], input[type="tel"],input[type="url"], select, textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      box-sizing: border-box; /* Added to maintain width including padding */
+    }
+    .two-column-form .col {
+      float: left;
+      width: 50%;
+      padding: 0 15px;
+      box-sizing: border-box; /* Added to maintain width including padding */
+    }
+    /* Clearfix to clear the float */
+    .two-column-form::after {
+      content: "";
+      clear: both;
+      display: table;
+    }
+    .btn-primary {
+      color: #fff;
+      background-color: #007bff;
+      border-color: #007bff;
+    }
+  </style>
+  
+<div class="container mt-4">
+    <div class="d-flex justify-content-between mb-3">
+        <h1>{% if edit %}Update{% else %}Create{% endif %} Customer</h1>
+        <a href="/dashboard/settings/customer" class="btn btn-success">Go Back</a>
+    </div>
+
+    <form method="post" novalidate>
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-6">
+                {% for field in form.visible_fields %}
+                    <div class="form-group">
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.help_text %}
+                            <small class="form-text text-muted">{{ field.help_text }}</small>
+                        {% endif %}
+
+                    </div>
+                    {% if forloop.counter|divisibleby:2 %}
+                        </div><div class="col-md-6">
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger" role="alert">
+                {% for error in form.non_field_errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
+        <div class="form-group mt-3">
+            <button type="submit" class="btn btn-success">{% if edit %}Update{% else %}Create{% endif %} Customer</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

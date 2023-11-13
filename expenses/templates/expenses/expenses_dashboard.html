@@ -51,7 +51,7 @@
                 <tr>
                     <td>{{ forloop.counter }}</td>
                     <td>{{ expense.expense_id }}</td>
-                    <td>{{ expense.Title }}</td>
+                    <td>{{ expense.title }}</td>
                     <td>{{ expense.type }}</td>
                     <td>{{ expense.date }}</td>
                     <td>{{ expense.payee }}</td>
@@ -68,7 +68,7 @@
                         <a href="#" class="btn btn-info btn-sm" data-toggle="modal" data-target="#uploadModal" onclick="setExpenseId('{{ expense.expense_id }}')">Upload Receipt</a>
 
                         
-                        <a href="#" class="btn btn-warning btn-sm">Upload DO</a>
+                        <a href="#" class="btn btn-warning btn-sm"  data-toggle="modal" data-target="#uploadDOModal" onclick="setExpenseIdDO('{{ expense.expense_id }}')">Upload DO</a>
 
                         
                         <!-- <a href="{% url 'generate_quotation' expense.expense_id %}" class="btn btn-secondary btn-sm">Quotation</a> -->
@@ -121,6 +121,9 @@
     function setExpenseId(expenseId) {
         document.getElementById('expenseIdInput').value = expenseId;
     }
+    function setExpenseIdDO(expenseId) {
+        document.getElementById('expenseIdInputDO').value = expenseId;
+    }
 </script>
 <!-- Modal -->
 <div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true">
@@ -138,6 +141,34 @@
               <div class="form-group">
                   <label for="fileInput">Select Receipt</label>
                   <input type="hidden" name="expense_id" id="expenseIdInput">
+                  <input type="file" name="file" class="form-control-file" id="fileInput">
+              </div>
+              <button type="submit" class="btn btn-primary">Upload</button>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- DO Modal -->
+<div class="modal fade" id="uploadDOModal" tabindex="-1" role="dialog" aria-labelledby="uploadDOModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="uploadDOModalLabel">Upload Delivery Order</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form action="{% url 'upload_do' %}" method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="form-group">
+                  <label for="fileInput">Select DO</label>
+                  <input  type="hidden" name="expense_id" id="expenseIdInputDO">
                   <input type="file" name="file" class="form-control-file" id="fileInput">
               </div>
               <button type="submit" class="btn btn-primary">Upload</button>

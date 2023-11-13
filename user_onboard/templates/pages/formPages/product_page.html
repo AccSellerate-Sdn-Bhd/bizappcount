@@ -16,7 +16,7 @@
     {% sidebar_template url="/dashboard/account-setup" request=request %}
     <!-- Content -->
     <div class="w-4/5 ml-auto p-8">
-      <h1 class="text-2xl font-bold">Create a new product</h1>
+      <h1 class="text-2xl font-bold">{% if edit %} Edit {% else %} Create {% endif %} a new product</h1>
       <p class="text-gray-400 mt-3 mb-6">Please enter the details down below</p>
 
       <form method="post">
@@ -114,7 +114,7 @@
         </div>
         {% endif %}
         <div class="flex justify-end mt-5">
-          <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md mr-2">Create</button>
+          <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md mr-2">{% if edit %} Update {% else %} Create {% endif %}</button>
         </div>
       </form>
 

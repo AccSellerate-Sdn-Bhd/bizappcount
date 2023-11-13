@@ -3,10 +3,17 @@
 {% block content %}
 <div class="d-flex justify-content-between mb-3">
   <h1>P&L Report</h1>
-  <div>
-    <a href="/dashboard/reports/generate_profit_and_loss" class="btn btn-success">Download PDF</a>
-    <a href="/dashboard/reports/generate_ledger_profit_and_loss" class="btn btn-success">Generate Report</a>
-  </div>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="flex flex-row space-x-3">
+      {{form.start_date}}
+      {{form.end_date}}
+      <!-- <a href="/dashboard/reports/generate_profit_and_loss" class="btn btn-success">Download PDF</a> -->
+      <button class="btn btn-success" type="submit">Generate Report</button>
+      <a href="/dashboard/reports/convert_to_ledger/profit-and-loss/" class="btn btn-success">Convert Journals</a>
+  </form>
+</div>
 </div>
 
 <table class="w-full border-collapse border">
@@ -20,12 +27,12 @@
   </thead>
   <tbody>
     {% for useraccount in type.data %}
-    
-      <tr>
-        <td class="border p-2">{{forloop.counter}}</td>
-        <td class="border p-2">{{useraccount.account.name}}</td>
-        <td class="border p-2">{{useraccount.amount}}</td>
-      </tr>
+
+    <tr>
+      <td class="border p-2">{{forloop.counter}}</td>
+      <td class="border p-2">{{useraccount.account.name}}</td>
+      <td class="border p-2">{{useraccount.amount}}</td>
+    </tr>
     {% endfor %}
   </tbody>
   {% endfor %}

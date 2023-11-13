@@ -41,3 +41,8 @@ class Receipt(models.Model):
     file = models.FileField(upload_to='receipts/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
     expense_id = models.ForeignKey(Expense, on_delete=models.DO_NOTHING ,db_column='expense_id', related_name='receipts')
+
+class DO(models.Model):
+    file = models.FileField(upload_to='do/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    expense_id = models.ForeignKey(Expense, on_delete=models.DO_NOTHING ,db_column='expense_id', related_name='do_forms')

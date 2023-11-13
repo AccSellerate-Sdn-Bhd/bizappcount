@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
 from user_onboard.models import User, Product
 from .models import Inventory, InventoryHistory
+from report.models import Account,Journal
 from .forms import InventoryForm
 from django.http import JsonResponse
-
+from datetime import datetime
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
@@ -38,7 +39,7 @@ def create(request):
 
     choices_list = [(product.product_id, product) for product in products]
     form = InventoryForm(dynamic_choices=choices_list)
-
+    account = Account.objects.get(name="Inventory")
     if request.method == 'POST':
         form = InventoryForm(request.POST, dynamic_choices=choices_list)
 
@@ -65,6 +66,21 @@ def create(request):
                     current_stock=form.cleaned_data['amount']
                 )
 
+                cost = float(form.cleaned_data['price_per_unit'])*float(form.cleaned_data['amount'])
+                operation= 1
+                new_journal = Journal(
+                    account = account,
+                    user = user,
+                    datetime =  datetime.now(),
+                    name = account.name,
+                    debit_amount=cost if operation == 1 else None,
+                    credit_amount= None if operation == 1 else cost,
+                    description="Inventory",
+                    editable=1
+                )
+                new_journal.save()
+
+
                 new_inventory.save()
                 new_inventory_history.save()
 
@@ -78,6 +94,9 @@ def create(request):
             return render(request, 'pages/inventoryform.html', {'form': form, 'url': "/dashboard/inventory"})
     else:
         return render(request, 'pages/inventoryform.html', {'form': form, 'url': "/dashboard/inventory"})
+
+
+
 
 
 def edit(request, id):
@@ -124,7 +143,6 @@ def edit(request, id):
                         increase = True
                         amount = difference
 
-                    print("\n a lot of heart")
                     print(amount)
 
                     new_inventory_history = InventoryHistory(

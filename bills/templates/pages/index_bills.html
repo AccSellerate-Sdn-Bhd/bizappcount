@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+  <h1>Bill</h1>
+  <a href="create" class="btn btn-success">Create New Bill</a>
+</div>
+
+<table class="table table-striped table-bordered table-hover">
+  <thead class="thead-dark">
+    <tr>
+      <th>No.</th>
+      <th>Bill Name</th>
+      <th>Bill Amount</th>
+      <th>Recurring Interval</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in bills %}
+    <tr>
+      <td>{{ forloop.counter }}</td>
+      <td>{{ item.name }}</td>
+      <td>{{ item.amount}}</td>
+      <td>{{ item.interval }}</td>
+      <td>
+        <a href="edit/{{item.bill_id}}" class="btn btn-primary btn-sm">Edit</a>
+        {% csrf_token %}
+        <button class="delete-button btn btn-danger btn-sm" data-id="{{ item.bill_id }}">Delete</button>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const deleteButtons = document.querySelectorAll(".delete-button");
+
+    deleteButtons.forEach(function (deleteButton) {
+      deleteButton.addEventListener("click", function () {
+        const id = deleteButton.getAttribute("data-id");
+        const url = `api/delete/${id}`;
+        console.log("clicked");
+        fetch(url, {
+          method: "DELETE",
+          headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "Content-Type": "application/json",
+          },
+        })
+          .then(async (response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log(data);
+            window.location.reload();
+          })
+          .catch((error) => {
+            console.error("Fetch Error: ", error);
+          });
+      });
+    });
+  });
+</script>
+
+</div>
+
+{% endblock %}

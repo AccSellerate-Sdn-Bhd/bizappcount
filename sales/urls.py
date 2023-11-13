@@ -16,5 +16,6 @@ urlpatterns = [
     path('delete_sales_line/<str:sales_line_id>/',  views.delete_sales_line, name='delete_sales_line'),
     path('edit_sales/<str:sales_id>/', views.edit_sales, name='edit_sales'),
     path('edit_sales_line/<str:sales_line_id>/', views.edit_sales_line, name='edit_sales_line'),
+    path('get_product_details/<int:product_id>/', views.get_product_details, name='get_product_details'),
 
 ]

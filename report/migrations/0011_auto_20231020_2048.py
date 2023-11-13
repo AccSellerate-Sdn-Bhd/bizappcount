@@ -8,9 +8,9 @@ def seed_data(apps, schema_editor):
     assets = Account.objects.filter(name="Assets").first()
     revenue = Account.objects.filter(name="Revenue").first()
     liabilities = Account.objects.filter(name="Liabilities").first()
-    expense = Account.objects.create(
-        name="Expense",
-        type="expense",
+    expenses = Account.objects.create(
+        name="Expenses",
+        type="expenses",
     )
 
     #Child Accounts
@@ -37,8 +37,8 @@ def seed_data(apps, schema_editor):
     )
     shipping_expense = Account.objects.create(
         name="Shipping Expense",
-        type="expense",
-        parent_acc=expense
+        type="expenses",
+        parent_acc=expenses
     )
     
     cash_account = Account.objects.filter(name="Cash Account").first()
@@ -64,8 +64,7 @@ def seed_data(apps, schema_editor):
         name="Sales Revenue (Self Defined)",
         sales_title="Direct Sales with Inventory",
         payment="Cash",
-        model="SalesLineItems",
-        datafield="total_price",
+        model="Product",
         account=cost_of_sales_inventory,
         operation=1
     )
@@ -82,8 +81,7 @@ def seed_data(apps, schema_editor):
         name="Sales Revenue (Self Defined)",
         sales_title="Direct Sales with Inventory",
         payment="Cash",
-        model="SalesLineItems",
-        datafield="total_price",
+        model="Product",
         account=inventory,
         operation=0
     )
@@ -102,8 +100,7 @@ def seed_data(apps, schema_editor):
         name="Sales Revenue (Self Defined)",
         sales_title="Direct Sales with Inventory",
         payment="Credit",
-        model="SalesLineItems",
-        datafield="total_price",
+        model="Product",
         account=cost_of_sales_inventory,
         operation=1
     )
@@ -120,8 +117,7 @@ def seed_data(apps, schema_editor):
         name="Sales Revenue (Self Defined)",
         sales_title="Direct Sales with Inventory",
         payment="Credit",
-        model="SalesLineItems",
-        datafield="total_price",
+        model="Product",
         account=inventory,
         operation=0
     )
@@ -140,8 +136,7 @@ def seed_data(apps, schema_editor):
         name="Sales Revenue (Self Defined)",
         sales_title="Direct Sales without Inventory",
         payment="Cash",
-        model="SalesLineItems",
-        datafield="total_price",
+        model="Product",
         account=cost_of_sales_dropshipping,
         operation=1
     )
@@ -261,77 +256,91 @@ def seed_data(apps, schema_editor):
     #9
     TransactionAction.objects.create(
         name="Cost of Sales (Inventory)",
-        sales_title="Purchase Inventory (Cash)",
+        expense_title="Purchase Inventory (Cash)",
         payment="Cash",
-        model="SalesLineItems",
-        datafield="total_price",
-        account=inventory,
+        model="Inventory",
         operation=1
     )
     TransactionAction.objects.create(
         name="Cost of Sales (Inventory)",
-        sales_title="Purchase Inventory (Cash)",
+        expense_title="Purchase Inventory (Cash)",
         payment="Cash",
-        model="SalesLineItems",
+        model="ExpenseLineItem",
         datafield="total_price",
         account=cash_account,
         operation=0
+    )
+    TransactionAction.objects.create(
+        name="Cost of Sales (Inventory)",
+        expense_title="Purchase Inventory (Cash)",
+        payment="Cash",
+        model="ExpenseLineItem",
+        datafield="total_price",
+        account=inventory,
+        operation=1
     )
 
     #10
     TransactionAction.objects.create(
         name="Cost of Sales (Inventory)",
-        sales_title="Purchase Inventory (Credit)",
+        expense_title="Purchase Inventory (Credit)",
         payment="Credit",
-        model="SalesLineItems",
-        datafield="total_price",
-        account=inventory,
+        model="Inventory",
         operation=1
     )
     TransactionAction.objects.create(
         name="Cost of Sales (Inventory)",
-        sales_title="Purchase Inventory (Credit)",
+        expense_title="Purchase Inventory (Credit)",
         payment="Credit",
-        model="SalesLineItems",
+        model="ExpenseLineItem",
         datafield="total_price",
         account=account_payable,
         operation=0
     )
+    TransactionAction.objects.create(
+        name="Cost of Sales (Inventory)",
+        expense_title="Purchase Inventory (Credit)",
+        payment="Credit",
+        model="ExpenseLineItem",
+        datafield="total_price",
+        account=inventory,
+        operation=1
+    )    
 
     #Cost of Sales (Shipping Expense)
     #11
     TransactionAction.objects.create(
         name="Cost of Sales (Shipping Expenses)",
-        sales_title="Shipping",
+        expense_title="Shipping",
         payment="Cash",
-        model="SalesLineItems",
+        model="ExpenseLineItem",
         datafield="total_price",
         account=shipping_expense,
         operation=1
     )
     TransactionAction.objects.create(
         name="Cost of Sales (Shipping Expenses)",
-        sales_title="Shipping",
+        expense_title="Shipping",
         payment="Cash",
-        model="SalesLineItems",
+        model="ExpenseLineItem",
         datafield="total_price",
         account=cash_account,
         operation=0
     )
     TransactionAction.objects.create(
         name="Cost of Sales (Shipping Expenses)",
-        sales_title="Shipping, Credit",
+        expense_title="Shipping, Credit",
         payment="Credit",
-        model="SalesLineItems",
+        model="ExpenseLineItem",
         datafield="total_price",
         account=shipping_expense,
         operation=1
     )
     TransactionAction.objects.create(
         name="Cost of Sales (Shipping Expenses)",
-        sales_title="Shipping, Credit",
+        expense_title="Shipping, Credit",
         payment="Credit",
-        model="SalesLineItems",
+        model="ExpenseLineItem",
         datafield="total_price",
         account=account_payable,
         operation=0

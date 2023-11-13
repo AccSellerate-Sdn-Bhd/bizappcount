@@ -3,6 +3,16 @@ from .forms import LoginForm, Onboard1Form, Onboard2Form
 from .accounts_forms import BankForm, OfficeForm, StaffForm, ProductForm, LoanForm, SoftwareCostForm, OwnerEquityForm
 from .models import User, Address, Business, Bank, Office, Staff, Product, Loan, SoftwareCost, OwnerEquity
 from django.contrib.auth import authenticate, login as auth_login, logout
+from report.models import AccountUserRelationship, Account
+from .functions.bank.views import bank_create, bank_edit
+from .functions.office.views import office_create, office_edit
+from .functions.staff.views import staff_create, staff_edit
+from .functions.product.views import product_create, product_edit
+from .functions.loan.views import loan_create, loan_edit
+from .functions.software.views import software_cost_create, software_cost_edit
+from .functions.equity.views import owner_equity_create, owner_equity_edit
+from django.http import JsonResponse
+from datetime import datetime as DateFunction
 
 # Create your views here.
 
@@ -49,6 +59,7 @@ def onboard_1(request):
         if form.is_valid():
             print("Form is valid")
             new_user = form.save()
+            createUserAccounts(new_user)
 
             user = authenticate(request, username=new_user.username,
                                 password=form.cleaned_data['password2'])
@@ -65,6 +76,51 @@ def onboard_1(request):
         form = Onboard1Form()
 
     return render(request, 'pages/onboard_1.html', {'form': form})
+
+def createUserAccounts(user):
+
+    def createAccount(account):
+        newuseraccount = AccountUserRelationship(
+            user=user,
+            account=account,
+            amount= 0
+        )
+        newuseraccount.save()
+
+    cash_account = Account.objects.get(name="Cash Account")
+    account_receivables = Account.objects.get(name="Account Receivables")
+    inventory = Account.objects.get(name="Inventory")
+    raw_materials = Account.objects.get(name="Raw Materials")
+
+    machine_and_equipment = Account.objects.get(name="Machine and Equipment")
+    investments = Account.objects.get(name="Investments")
+    accumulated_depreciation = Account.objects.get(name="Accumulated Depreciation")
+
+    account_payable = Account.objects.get(name="Account Payable")
+    short_term_debt = Account.objects.get(name="Short Term Debt")
+    long_term_debt = Account.objects.get(name="Long Term Debt")
+
+    owners_capital = Account.objects.get(name="Owners Capital")
+    retained_earnings = Account.objects.get(name="Retained Earnings")
+
+    createAccount(cash_account)
+    createAccount(account_receivables)
+    createAccount(inventory)
+    createAccount(raw_materials)
+
+    createAccount(machine_and_equipment)
+    createAccount(investments)
+    createAccount(accumulated_depreciation)
+
+    createAccount(account_payable)
+    createAccount(short_term_debt)
+    createAccount(long_term_debt)
+    
+    createAccount(owners_capital)
+    createAccount(retained_earnings)
+
+
+    
 
 
 def onboard_2(request):
@@ -139,13 +195,13 @@ def onboard_4(request):
     try:
         user = User.objects.get(username=request.user)
         business = Business.objects.get(user=user)
-        banks = Bank.objects.filter(user=user)
-        offices = Office.objects.filter(user=user)
-        staffs = Staff.objects.filter(user=user)
-        products = Product.objects.filter(user=user)
-        loans = Loan.objects.filter(user=user)
-        software_costs = SoftwareCost.objects.filter(user=user)
-        owner_equities = OwnerEquity.objects.filter(user=user)
+        banks = Bank.objects.filter(user=user, deleted=False)
+        offices = Office.objects.filter(user=user, deleted=False)
+        staffs = Staff.objects.filter(user=user, deleted=False)
+        products = Product.objects.filter(user=user, deleted=False)
+        loans = Loan.objects.filter(user=user, deleted=False)
+        software_costs = SoftwareCost.objects.filter(user=user, deleted=False)
+        owner_equities = OwnerEquity.objects.filter(user=user, deleted=False)
     except Exception as e:
         return redirect('/')
 
@@ -167,443 +223,161 @@ def onboard_4(request):
 
 
 def create_bank(request):
-    try:
-        user = User.objects.get(username=request.user)
-        addresses = Address.objects.filter(user=user)
-    except Exception as e:
-        return redirect('/')
+    return bank_create(request)
 
-    choices_list = [(address.address_id, address) for address in addresses]
+def edit_bank(request, id):
+    return bank_edit(request, id)
 
-    form = BankForm(dynamic_choices=choices_list)
+def delete_bank(request, id):
+    print("delete the following")
+    print(id)
+    if request.method == 'DELETE':
+        try:
+            bank = Bank.objects.get(pk=id)
+            bank.deleted = True
+            bank.deleted_at = DateFunction.now()
+            bank.save()
 
-    if request.method == 'POST':
-        form = BankForm(request.POST, dynamic_choices=choices_list)
+            return JsonResponse({"success": True})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": e})
 
-        if form.is_valid():
-            print(form.cleaned_data['create_new_address'])
-
-            try:
-                if(form.cleaned_data['create_new_address']):
-                    new_address = Address(
-                        line_one=form.cleaned_data['line_one'],
-                        line_two=form.cleaned_data['line_two'],
-                        postcode=form.cleaned_data['postcode'],
-                        city=form.cleaned_data['city'],
-                        state=form.cleaned_data['state'],
-                        GPS_location=form.cleaned_data['gps_location'],
-                        office_tel_no=form.cleaned_data['office_tel_no'],
-                        user=user
-                    )
-
-                    new_address.save()
-
-                    new_bank = Bank(
-                        user=user,
-                        name=form.cleaned_data['name'],
-                        account_no=form.cleaned_data['account_no'],
-                        address=new_address,
-                        type=form.cleaned_data['type'],
-                        bizapp=form.cleaned_data['bizapp'],
-                    )
-
-                    new_bank.save()
-
-                    return redirect("/dashboard/account-setup")
-                else:
-                    print(form.cleaned_data['address'])
-                    existing_address = Address.objects.get(pk=form.cleaned_data['address'])
-
-                    new_bank = Bank(
-                        user=user,
-                        name=form.cleaned_data['name'],
-                        account_no=form.cleaned_data['account_no'],
-                        address=existing_address,
-                        type=form.cleaned_data['type'],
-                        bizapp=form.cleaned_data['bizapp'],
-                    )
-
-                    new_bank.save()
-
-                    return redirect("/dashboard/account-setup")
-            except Exception as e:
-                error_message = str(e)
-                form.add_error(None, error_message)
-                return render(request, 'pages/formPages/bank_page.html', {'form': form})
-
-
-        else:
-            return render(request, 'pages/formPages/bank_page.html', {'form': form})
-    else:
-        return render(request, 'pages/formPages/bank_page.html', {'form': form})
-
+    return JsonResponse({"success": False, "error": "Invalid request method"})
 
 
 def create_office(request):
-    try:
-        user = User.objects.get(username=request.user)
-        addresses = Address.objects.filter(user=user)
-    except Exception as e:
-        return redirect('/')
+    return office_create(request)
 
-    choices_list = [(address.address_id, address) for address in addresses]
+def edit_office(request, id):
+    return office_edit(request, id)
 
-    form = OfficeForm(dynamic_choices=choices_list)
+def delete_office(request, id):
+    print("delete the following")
+    print(id)
+    if request.method == 'DELETE':
+        try:
+            office = Office.objects.get(pk=id)
+            office.deleted = True
+            office.deleted_at = DateFunction.now()
+            office.save()
 
-    if request.method == 'POST':
-        form = OfficeForm(request.POST, dynamic_choices=choices_list)
+            return JsonResponse({"success": True})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": e})
 
-        if form.is_valid():
-            try:
-                if(form.cleaned_data['create_new_address']):
-                    new_address = Address(
-                        line_one=form.cleaned_data['line_one'],
-                        line_two=form.cleaned_data['line_two'],
-                        postcode=form.cleaned_data['postcode'],
-                        city=form.cleaned_data['city'],
-                        state=form.cleaned_data['state'],
-                        GPS_location=form.cleaned_data['gps_location'],
-                        office_tel_no=form.cleaned_data['office_tel_no'],
-                        user=user
-                    )
-
-                    new_address.save()
-
-                    new_office = Office(
-                        user=user,
-                        name=form.cleaned_data['name'],
-                        address=new_address,
-
-                        rent=form.cleaned_data['rent'],
-                        electric=int(
-                            form.cleaned_data['electric']) if form.cleaned_data['electric'] else 0,
-                        water=int(form.cleaned_data['water']
-                                ) if form.cleaned_data['water'] else 0,
-                        internet=int(
-                            form.cleaned_data['internet']) if form.cleaned_data['internet'] else 0,
-                        rental=int(form.cleaned_data['rental']
-                                ) if form.cleaned_data['rental'] else 0,
-                        rental_deposit=int(
-                            form.cleaned_data['rental_deposit']) if form.cleaned_data['rental_deposit'] else 0,
-                    )
-
-                    new_office.save()
-
-                    return redirect("/dashboard/account-setup")
-                else:
-                    existing_address = Address.objects.get(pk=form.cleaned_data['address'])
-                    new_office = Office(
-                        user=user,
-                        name=form.cleaned_data['name'],
-                        address=existing_address,
-
-                        rent=form.cleaned_data['rent'],
-                        electric=int(
-                            form.cleaned_data['electric']) if form.cleaned_data['electric'] else 0,
-                        water=int(form.cleaned_data['water']
-                                ) if form.cleaned_data['water'] else 0,
-                        internet=int(
-                            form.cleaned_data['internet']) if form.cleaned_data['internet'] else 0,
-                        rental=int(form.cleaned_data['rental']
-                                ) if form.cleaned_data['rental'] else 0,
-                        rental_deposit=int(
-                            form.cleaned_data['rental_deposit']) if form.cleaned_data['rental_deposit'] else 0,
-                    )
-
-                    new_office.save()
-
-                    return redirect("/dashboard/account-setup")
-                
-            except Exception as e:
-                error_message = str(e)
-                form.add_error(None, error_message)
-                return render(request, 'pages/formPages/office_page.html', {'form': form})
-        else:
-            form = OfficeForm(request, dynamic_choices=choices_list)
- 
-    return render(request, 'pages/formPages/office_page.html', {'form': form})
+    return JsonResponse({"success": False, "error": "Invalid request method"})
 
 
 def create_staff(request):
-    try:
-        user = User.objects.get(username=request.user)
-        addresses = Address.objects.filter(user=user)
-    except Exception as e:
-        return redirect('/')
+    return staff_create(request)
 
-    choices_list = [(address.address_id, address) for address in addresses]
+def edit_staff(request, id):
+    return staff_edit(request, id)
 
-    form = StaffForm(dynamic_choices=choices_list)
+def delete_staff(request, id):
+    print("delete the following")
+    print(id)
+    if request.method == 'DELETE':
+        try:
+            staff = Staff.objects.get(pk=id)
+            staff.deleted = True
+            staff.deleted_at = DateFunction.now()
+            staff.save()
 
-    if request.method == 'POST':
-        form = StaffForm(request.POST, dynamic_choices=choices_list)
+            return JsonResponse({"success": True})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": e})
 
-        if form.is_valid():
-            try:
-                if(form.cleaned_data['create_new_address']):
-                    new_address = Address(
-                        line_one=form.cleaned_data['line_one'],
-                        line_two=form.cleaned_data['line_two'],
-                        postcode=form.cleaned_data['postcode'],
-                        city=form.cleaned_data['city'],
-                        state=form.cleaned_data['state'],
-                        GPS_location=form.cleaned_data['gps_location'],
-                        office_tel_no=form.cleaned_data['office_tel_no'],
-                        user=user
-                    )
-
-                    new_address.save()
-
-                    new_staff = Staff(
-                        user=user,
-                        name=form.cleaned_data['name'],
-                        address=new_address,
-
-                        ic_passport = form.cleaned_data['ic_passport'],
-                        type = form.cleaned_data['type'],
-                        phone_no = form.cleaned_data['phone_no'],
-                        date_joined = form.cleaned_data['date_joined'],
-                        position = form.cleaned_data['position'],
-                        salary = float(form.cleaned_data['salary']),
-                        epf = float(form.cleaned_data['epf']),
-                    )
-
-                    new_staff.save()
-
-                    return redirect("/dashboard/account-setup")
-                else:
-                    existing_address = Address.objects.get(pk=form.cleaned_data['address'])
-                    
-                    new_staff = Staff(
-                        user=user,
-                        name=form.cleaned_data['name'],
-                        address=existing_address,
-
-                        ic_passport = form.cleaned_data['ic_passport'],
-                        type = form.cleaned_data['type'],
-                        phone_no = form.cleaned_data['phone_no'],
-                        date_joined = form.cleaned_data['date_joined'],
-                        position = form.cleaned_data['position'],
-                        salary = float(form.cleaned_data['salary']),
-                        epf = float(form.cleaned_data['epf']),
-                    )
-
-                    new_staff.save()
-
-                    return redirect("/dashboard/account-setup")
-                
-            except Exception as e:
-                error_message = str(e)
-                form.add_error(None, error_message)
-                return render(request, 'pages/formPages/staff_page.html', {'form': form})
-        else:
-            form = StaffForm(request, dynamic_choices=choices_list)
- 
-    return render(request, 'pages/formPages/staff_page.html', {'form': form})
+    return JsonResponse({"success": False, "error": "Invalid request method"})
 
 
 def create_product(request):
-    try:
-        user = User.objects.get(username=request.user)
-    except Exception as e:
-        return redirect('/')
-    
-    form = ProductForm()
+    return product_create(request)
 
-    if request.method == 'POST':
-        form = ProductForm(request.POST)
+def edit_product(request, id):
+    return product_edit(request, id)
 
-        if form.is_valid():
-            try:
-                new_product = Product(
-                    name = form.cleaned_data['name'],
-                    description = form.cleaned_data['description'],
-                    brand = form.cleaned_data['brand'],
-                    collection = form.cleaned_data['collection'],
-                    SKU = form.cleaned_data['SKU'],
-                    barcode = form.cleaned_data['barcode'],
-                    weight = int(form.cleaned_data['weight']) if form.cleaned_data['weight'] else None,
-                    height = int(form.cleaned_data['height']) if form.cleaned_data['height'] else None,
-                    width = int(form.cleaned_data['width']) if form.cleaned_data['width'] else None,
-                    length = int(form.cleaned_data['length']) if form.cleaned_data['length'] else None,
-                    cost = form.cleaned_data['cost'],
-                    forex = form.cleaned_data['forex'],
-                    retail_selling_price = form.cleaned_data['retail_selling_price'],
-                    status = form.cleaned_data['status'],
-                    user=user
-                )
+def delete_product(request, id):
+    print("delete the following")
+    print(id)
+    if request.method == 'DELETE':
+        try:
+            product = Product.objects.get(pk=id)
+            product.deleted = True
+            product.deleted_at = DateFunction.now()
+            product.save()
 
-                new_product.save()
+            return JsonResponse({"success": True})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": e})
 
-                return redirect("/dashboard/account-setup")
-                
-            except Exception as e:
-                error_message = str(e)
-                form.add_error(None, error_message)
-                return render(request, 'pages/formPages/product_page.html', {'form': form})
-        else:
-            print(form.errors)
-            form = ProductForm(request.POST)
- 
-    return render(request, 'pages/formPages/product_page.html', {'form': form})
-
+    return JsonResponse({"success": False, "error": "Invalid request method"})
 
 def create_loan(request):
-    try:
-        user = User.objects.get(username=request.user)
-        addresses = Address.objects.filter(user=user)
-    except Exception as e:
-        return redirect('/')
+    return loan_create(request)
 
-    choices_list = [(address.address_id, address) for address in addresses]
+def edit_loan(request, id):
+    return loan_edit(request, id)
 
-    form = LoanForm(dynamic_choices=choices_list)
+def delete_loan(request, id):
+    print("delete the following")
+    print(id)
+    if request.method == 'DELETE':
+        try:
+            loan = Loan.objects.get(pk=id)
+            loan.deleted = True
+            loan.deleted_at = DateFunction.now()
+            loan.save()
 
-    if request.method == 'POST':
-        form = LoanForm(request.POST, dynamic_choices=choices_list)
+            return JsonResponse({"success": True})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": e})
 
-        if form.is_valid():
-            try:
-                if(form.cleaned_data['create_new_address']):
-                    new_address = Address(
-                        line_one=form.cleaned_data['line_one'],
-                        line_two=form.cleaned_data['line_two'],
-                        postcode=form.cleaned_data['postcode'],
-                        city=form.cleaned_data['city'],
-                        state=form.cleaned_data['state'],
-                        GPS_location=form.cleaned_data['gps_location'],
-                        office_tel_no=form.cleaned_data['office_tel_no'],
-                        user=user
-                    )
-
-                    new_address.save()
-
-                    new_loan = Loan(
-                        user=user,
-                        name = form.cleaned_data['name'],
-                        category = form.cleaned_data['category'],
-                        creditor = form.cleaned_data['creditor'],
-                        creditor_address = new_address,
-                        creditor_phone_no = form.cleaned_data['creditor_phone_no'],
-                        
-                        amount = form.cleaned_data['amount'],
-                        amount_payable = form.cleaned_data['amount_payable'],
-                        interest = form.cleaned_data['interest'],
-                        installment_amount = form.cleaned_data['installment_amount'],
-                        not_defined = form.cleaned_data['not_defined'],
-                        recurring = form.cleaned_data['recurring'],
-                        active = form.cleaned_data['active'],
-                        )
-
-                    new_loan.save()
-
-                    return redirect("/dashboard/account-setup")
-                else:
-                    existing_address = Address.objects.get(pk=form.cleaned_data['address'])
-                    
-                    new_loan = Loan(
-                        user=user,
-                        name = form.cleaned_data['name'],
-                        category = form.cleaned_data['category'],
-                        creditor = form.cleaned_data['creditor'],
-                        creditor_address = existing_address,
-                        creditor_phone_no = form.cleaned_data['creditor_phone_no'],
-                        
-                        amount = form.cleaned_data['amount'],
-                        amount_payable = form.cleaned_data['amount_payable'],
-                        interest = form.cleaned_data['interest'],
-                        installment_amount = form.cleaned_data['installment_amount'],
-                        not_defined = form.cleaned_data['not_defined'],
-                        recurring = form.cleaned_data['recurring'],
-                        active = form.cleaned_data['active'],
-                        )
-
-                    new_loan.save()
-
-                    return redirect("/dashboard/account-setup")
-                
-            except Exception as e:
-                error_message = str(e)
-                form.add_error(None, error_message)
-                return render(request, 'pages/formPages/loan_page.html', {'form': form})
-        else:
-            form = LoanForm(request, dynamic_choices=choices_list)
- 
-    return render(request, 'pages/formPages/loan_page.html', {'form': form})
+    return JsonResponse({"success": False, "error": "Invalid request method"})
 
 def create_software_cost(request):
-    try:
-        user = User.objects.get(username=request.user)
-    except Exception as e:
-        return redirect('/')
-    
-    form = SoftwareCostForm()
+    return software_cost_create(request)
 
-    if request.method == 'POST':
-        form = SoftwareCostForm(request.POST)
+def edit_software_cost(request, id):
+    return software_cost_edit(request, id)
 
-        if form.is_valid():
-            try:
-                new_software_cost = SoftwareCost(
-                    name = form.cleaned_data['name'],
-                    type = form.cleaned_data['type'],
-                    software_billing_info = form.cleaned_data['software_billing_info'],
-                    company_name = form.cleaned_data['company_name'],
-                    billing_duration = form.cleaned_data['billing_duration'],
-                    amount = form.cleaned_data['amount'],
-                    active = form.cleaned_data['active'],
-                    user=user
-                )
+def delete_software_cost(request, id):
+    print("delete the following")
+    print(id)
+    if request.method == 'DELETE':
+        try:
+            software = SoftwareCost.objects.get(pk=id)
+            software.deleted = True
+            software.deleted_at = DateFunction.now()
+            software.save()
 
-                new_software_cost.save()
+            return JsonResponse({"success": True})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": e})
 
-                return redirect("/dashboard/account-setup")
-                
-            except Exception as e:
-                error_message = str(e)
-                form.add_error(None, error_message)
-                return render(request, 'pages/formPages/software_page.html', {'form': form})
-        else:
-            print(form.errors)
-            form = SoftwareCostForm(request.POST)
- 
-    return render(request, 'pages/formPages/software_page.html', {'form': form})
+    return JsonResponse({"success": False, "error": "Invalid request method"})
 
 
 def create_owner_equity(request):
-    try:
-        user = User.objects.get(username=request.user)
-    except Exception as e:
-        return redirect('/')
-    
-    form = OwnerEquityForm()
+    return owner_equity_create(request)
 
-    if request.method == 'POST':
-        form = OwnerEquityForm(request.POST)
+def edit_owner_equity(request, id):
+    return owner_equity_edit(request, id)
 
-        if form.is_valid():
-            try:
-                new_owner_equity = OwnerEquity(
-                    name = form.cleaned_data['name'],
-                    ic_passport = form.cleaned_data['ic_passport'],
-                    nationality = form.cleaned_data['nationality'],
-                    bumiputera = form.cleaned_data['bumiputera'],
-                    percentage_ownership = form.cleaned_data['percentage_ownership'],
-                    paid_up_capital = form.cleaned_data['paid_up_capital'],
-                    user=user
-                )
+def delete_owner_equity(request, id):
+    print("delete the following")
+    print(id)
+    if request.method == 'DELETE':
+        try:
+            equity = OwnerEquity.objects.get(pk=id)
+            equity.deleted = True
+            equity.deleted_at = DateFunction.now()
+            equity.save()
 
-                new_owner_equity.save()
+            return JsonResponse({"success": True})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": e})
 
-                return redirect("/dashboard/account-setup")
-                
-            except Exception as e:
-                error_message = str(e)
-                form.add_error(None, error_message)
-                return render(request, 'pages/formPages/equity_page.html', {'form': form})
-        else:
-            print(form.errors)
-            form = OwnerEquityForm(request.POST)
- 
-    return render(request, 'pages/formPages/equity_page.html', {'form': form})
+    return JsonResponse({"success": False, "error": "Invalid request method"})
+
 

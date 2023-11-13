@@ -3,13 +3,24 @@
 {% block content %}
 <div class="d-flex justify-content-between mb-3">
   <h1>General Ledger</h1>
-  <a href="/dashboard/reports/generate_cash_flow" class="btn btn-success">Download PDF</a>
+  <form method="post">
+    {% csrf_token %}
+    <div class="flex flex-row space-x-3">
+      {{form.start_date}}
+      {{form.end_date}}
+      <!-- <a href="/dashboard/reports/generate_cash_flow" class="btn btn-success">Download PDF</a> -->
+      <button class="btn btn-success" type="submit">Generate Report</button>
+      <a href="/dashboard/reports/convert_to_ledger/general-ledger/" class="btn btn-success">Convert Ledger</a>
+    </div>
+  </form>
 </div>
 
 <table class="w-full border-collapse border">
   <thead class="bg-gray-300">
     <tr>
       <th class="border p-2 w-2/12" rowspan="2">No.</th>
+      <th class="border p-2 w-2/12" rowspan="2">Date</th>
+      <th class="border p-2 w-2/12" rowspan="2">Account Name</th>
       <th class="border p-2" rowspan="2">Description</th>
       <th class="border p-2" colspan="2">Amount</th>
     </tr>
@@ -19,12 +30,16 @@
     </tr>
   </thead>
   <tbody>
+    {% for ledger in ledgers %}
     <tr>
-      <td class="border p-2">1</td>
-      <td class="border p-2">Description goes here</td>
-      <td class="border p-2">0.00</td>
-      <td class="border p-2">0.00</td>
+      <td class="border p-2">{{forloop.counter}}</td>
+      <td class="border p-2">{{ ledger.datetime|date:"Y-m-d" }}</td>
+      <td class="border p-2">{{ledger.account.name}}</td>
+      <td class="border p-2">{{ledger.description}}</td>
+      <td class="border p-2">{{ledger.debit_amount|default:"0"}}</td>
+      <td class="border p-2">{{ledger.credit_amount|default:"0"}}</td>
     </tr>
+    {% endfor %}
   </tbody>
 
 </table>

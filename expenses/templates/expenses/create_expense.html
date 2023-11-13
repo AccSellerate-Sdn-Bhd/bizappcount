@@ -84,7 +84,7 @@
 
                         <div class="mb-3">
                             <label for="{{ form.recurring_amount.id_for_label }}" class="form-label">Recurring Amount</label>
-                            <input type="text" class="form-control" id="{{ form.recurring_amount.id_for_label }}" name="{{ form.recurring_amount.name }}" value="{{ form.recurring_amount.value|default:'' }}" required>
+                            <input type="text" class="form-control" id="{{ form.recurring_amount.id_for_label }}" name="{{ form.recurring_amount.name }}" value="{{ form.recurring_amount.value|default:'' }}" >
                         </div>
                         <!-- ... And more fields for the right column here ... -->
                     </div>
@@ -130,7 +130,7 @@
                     </table>
                 </div>
             </div>
-            <button id="addRow"  type="button" class="btn btn-primary">Add Row</button>
+            <!-- <button id="addRow"  type="button" class="btn btn-primary">Add Row</button> -->
         </div>
         
     </div>

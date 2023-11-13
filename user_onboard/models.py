@@ -52,6 +52,8 @@ class Bank(models.Model):
     address = models.ForeignKey(Address, on_delete=models.CASCADE)
     type = models.IntegerField()
     bizapp = models.BooleanField()
+    deleted = models.BooleanField(default=False)
+    deleted_at= models.DateTimeField(null=True, default=None)
 
     class Meta:
         db_table = 'bank'
@@ -70,6 +72,8 @@ class Office(models.Model):
     internet = models.IntegerField()
     rental = models.IntegerField()
     rental_deposit = models.IntegerField()
+    deleted = models.BooleanField(default=False)
+    deleted_at= models.DateTimeField(null=True, default=None)
 
     class Meta:
         db_table = 'office'
@@ -89,6 +93,8 @@ class Staff(models.Model):
     position = models.CharField(max_length=255)
     salary = models.FloatField()
     epf = models.FloatField()
+    deleted = models.BooleanField(default=False)
+    deleted_at= models.DateTimeField(null=True, default=None)
 
     class Meta:
         db_table = 'staff'
@@ -113,6 +119,8 @@ class Product(models.Model):  # Inventory
     forex = models.IntegerField()
     retail_selling_price = models.FloatField()
     status = models.CharField(max_length=255)
+    deleted = models.BooleanField(default=False)
+    deleted_at= models.DateTimeField(null=True, default=None)
 
     def __str__(self):
         return self.name
@@ -138,6 +146,8 @@ class Loan(models.Model):
     not_defined = models.BooleanField()
     recurring = models.BooleanField()
     active = models.BooleanField()
+    deleted = models.BooleanField(default=False)
+    deleted_at= models.DateTimeField(null=True, default=None)
 
     class Meta:
         db_table = 'loan'
@@ -154,12 +164,14 @@ class SoftwareCost(models.Model):
     billing_duration = models.CharField(max_length=255)
     amount = models.FloatField(null=True)
     active = models.BooleanField()
+    deleted = models.BooleanField(default=False)
+    deleted_at= models.DateTimeField(null=True, default=None)
 
     class Meta:
         db_table = 'software_cost'
 
 class OwnerEquity(models.Model):
-    software_cost_id = models.AutoField(primary_key=True)
+    equity_id = models.AutoField(primary_key=True)
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, null=True, blank=True)
 
@@ -169,6 +181,8 @@ class OwnerEquity(models.Model):
     bumiputera = models.BooleanField()
     percentage_ownership = models.FloatField()
     paid_up_capital = models.FloatField()
+    deleted = models.BooleanField(default=False)
+    deleted_at= models.DateTimeField(null=True, default=None)
 
     class Meta:
         db_table = 'owner_equity'

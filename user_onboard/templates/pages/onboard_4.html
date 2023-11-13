@@ -63,6 +63,7 @@
                 <th class="border p-2">Name</th>
                 <th class="border p-2">Type</th>
                 <th class="border p-2">Address</th>
+                <th class="border p-2">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -72,6 +73,11 @@
                 <td class="border p-2">{{bank.name}}</td>
                 <td class="border p-2">{{bank.type}}</td>
                 <td class="border p-2">{{bank.address.city}}, {{bank.address.state}}</td>
+                <td>
+                  <a href="/dashboard/bank/edit/{{bank.bank_id}}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Edit</a>
+                  {% csrf_token %}
+                  <button class="delete-button-bank bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600" data-id="{{ bank.bank_id }}">Delete</button>
+                </td>
               </tr>
               {% endfor %}
 
@@ -135,6 +141,7 @@
                 <th class="border p-2">Name</th>
                 <th class="border p-2">Address</th>
                 <th class="border p-2">Rented</th>
+                <th class="border p-2">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -144,6 +151,11 @@
                 <td class="border p-2">{{office.name}}</td>
                 <td class="border p-2">{{office.address.city}}, {{office.address.state}}</td>
                 <td class="border p-2">{% if office.rent %} Rented {% else %} Owned {% endif %}</td>
+                <td>
+                  <a href="/dashboard/office/edit/{{office.office_id}}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Edit</a>
+                  {% csrf_token %}
+                  <button class="delete-button-office bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600" data-id="{{ office.office_id }}">Delete</button>
+                </td>
               </tr>
               {% endfor %}
             </tbody>
@@ -208,6 +220,7 @@
                 <th class="border p-2">Phone Number</th>
                 <th class="border p-2">Date Joined</th>
                 <th class="border p-2">Address</th>
+                <th class="border p-2">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -219,6 +232,11 @@
                 <td class="border p-2">{{staff.phone_no}}</td>
                 <td class="border p-2">{{staff.date_joined}}</td>
                 <td class="border p-2">{{staff.address.city}}, {{staff.address.state}}</td>
+                <td>
+                  <a href="/dashboard/staff/edit/{{staff.staff_id}}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Edit</a>
+                  {% csrf_token %}
+                  <button class="delete-button-staff bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600" data-id="{{ staff.staff_id }}">Delete</button>
+                </td>
               </tr>
               {% endfor %}
             </tbody>
@@ -239,7 +257,7 @@
       <!-- Current Liabilities Information -->
       <div class="border border-gray-200 mt-7">
         <button class="flex items-center justify-between p-4 w-full text-left bg-gray-200">
-          <span class="text-md">4. Inventory</span>
+          <span class="text-md">4. Products</span>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transition-transform transform rotate-0"
             viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd"
@@ -283,6 +301,7 @@
                 <th class="border p-2">Brand</th>
                 <th class="border p-2">SKU</th>
                 <th class="border p-2">Status</th>
+                <th class="border p-2">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -294,6 +313,11 @@
                 <td class="border p-2">{{product.brand}}</td>
                 <td class="border p-2">{{product.SKU}}</td>
                 <td class="border p-2">{{product.status}}</td>
+                <td>
+                  <a href="/dashboard/product/edit/{{product.product_id}}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Edit</a>
+                  {% csrf_token %}
+                  <button class="delete-button-product bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600" data-id="{{ product.product_id }}">Delete</button>
+                </td>
               </tr>
               {% endfor %}
             </tbody>
@@ -359,6 +383,7 @@
                 <th class="border p-2">Amount Payable</th>
                 <th class="border p-2">Installment Amount</th>
                 <th class="border p-2">Active</th>
+                <th class="border p-2">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -371,6 +396,11 @@
                 <td class="border p-2">{{loan.amount_payable}}</td>
                 <td class="border p-2">{{loan.installment_amount}}</td>
                 <td class="border p-2">{% if loan.active %} active {% else %} inactive {% endif %}</td>
+                <td>
+                  <a href="/dashboard/loan/edit/{{loan.loan_id}}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Edit</a>
+                  {% csrf_token %}
+                  <button class="delete-button-loan bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600" data-id="{{ loan.loan_id }}">Delete</button>
+                </td>
               </tr>
               {% endfor %}
             </tbody>
@@ -381,7 +411,8 @@
               <i class="fas fa-times text-black text-lg"></i>
             </div>
 
-            <a class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" href="/dashboard/loan/create">Create Loan</a>
+            <a class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" href="/dashboard/loan/create">Create
+              Loan</a>
           </div>
 
         </div>
@@ -434,6 +465,7 @@
                 <th class="border p-2">Type</th>
                 <th class="border p-2">Amount</th>
                 <th class="border p-2">Active</th>
+                <th class="border p-2">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -445,6 +477,11 @@
                 <td class="border p-2">{{software_cost.type}}</td>
                 <td class="border p-2">{{software_cost.amount}}</td>
                 <td class="border p-2">{% if software_cost.active %} active {% else %} inactive {% endif %}</td>
+                <td>
+                  <a href="/dashboard/software-cost/edit/{{software_cost.software_cost_id}}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Edit</a>
+                  {% csrf_token %}
+                  <button class="delete-button-software bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600" data-id="{{ software_cost.software_cost_id }}">Delete</button>
+                </td>
               </tr>
               {% endfor %}
             </tbody>
@@ -455,7 +492,8 @@
               <i class="fas fa-times text-black text-lg"></i>
             </div>
 
-            <a class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" href="/dashboard/software-cost/create">Create Software Cost</a>
+            <a class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              href="/dashboard/software-cost/create">Create Software Cost</a>
           </div>
 
         </div>
@@ -508,6 +546,7 @@
                 <th class="border p-2">Nationality</th>
                 <th class="border p-2">Bumiputera</th>
                 <th class="border p-2">Percentage Ownership</th>
+                <th class="border p-2">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -519,6 +558,11 @@
                 <td class="border p-2">{{owner_equity.nationality}}</td>
                 <td class="border p-2">{% if owner_equity.bumiputera %} yes {% else %} no {% endif %}</td>
                 <td class="border p-2">{{owner_equity.percentage_ownership}}</td>
+                <td>
+                  <a href="/dashboard/owner-equity/edit/{{owner_equity.equity_id}}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Edit</a>
+                  {% csrf_token %}
+                  <button class="delete-button-equity bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600" data-id="{{ owner_equity.equity_id }}">Delete</button>
+                </td>
               </tr>
               {% endfor %}
             </tbody>
@@ -529,7 +573,8 @@
               <i class="fas fa-times text-black text-lg"></i>
             </div>
 
-            <a class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" href="/dashboard/owner-equity/create">Create Owner Equity</a>
+            <a class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              href="/dashboard/owner-equity/create">Create Owner Equity</a>
           </div>
 
         </div>
@@ -548,6 +593,234 @@
         icon.classList.toggle('rotate-0');
       });
     });
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+    
+    //Bank
+    const deleteBankButtons = document.querySelectorAll(".delete-button-bank");
+
+    deleteBankButtons.forEach(function (deleteButton) {
+      deleteButton.addEventListener("click", function () {
+        const id = deleteButton.getAttribute("data-id");
+        const url = `/api/bank/delete/${id}`;
+        console.log("clicked");
+        fetch(url, {
+          method: "DELETE",
+          headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "Content-Type": "application/json",
+          },
+        })
+          .then(async (response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log(data);
+            window.location.reload();
+          })
+          .catch((error) => {
+            console.error("Fetch Error: ", error);
+          });
+      });
+    });
+    //end Bank
+
+    //Office
+    const deleteOfficeButtons = document.querySelectorAll(".delete-button-office");
+
+    deleteOfficeButtons.forEach(function (deleteButton) {
+      deleteButton.addEventListener("click", function () {
+        console.log("clicked")
+        const id = deleteButton.getAttribute("data-id");
+        const url = `/api/office/delete/${id}`;
+        console.log("clicked");
+        fetch(url, {
+          method: "DELETE",
+          headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "Content-Type": "application/json",
+          },
+        })
+          .then(async (response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log(data);
+            window.location.reload();
+          })
+          .catch((error) => {
+            console.error("Fetch Error: ", error);
+          });
+      });
+    });
+    //end Office
+
+    //Staff
+    const deleteStaffButtons = document.querySelectorAll(".delete-button-staff");
+
+    deleteStaffButtons.forEach(function (deleteButton) {
+      deleteButton.addEventListener("click", function () {
+        console.log("clicked")
+        const id = deleteButton.getAttribute("data-id");
+        const url = `/api/staff/delete/${id}`;
+        console.log("clicked");
+        fetch(url, {
+          method: "DELETE",
+          headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "Content-Type": "application/json",
+          },
+        })
+          .then(async (response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log(data);
+            window.location.reload();
+          })
+          .catch((error) => {
+            console.error("Fetch Error: ", error);
+          });
+      });
+    });
+    //end Staff
+
+    //Product
+    const deleteProductButtons = document.querySelectorAll(".delete-button-product");
+
+    deleteProductButtons.forEach(function (deleteButton) {
+      deleteButton.addEventListener("click", function () {
+        console.log("clicked")
+        const id = deleteButton.getAttribute("data-id");
+        const url = `/api/product/delete/${id}`;
+        console.log("clicked");
+        fetch(url, {
+          method: "DELETE",
+          headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "Content-Type": "application/json",
+          },
+        })
+          .then(async (response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log(data);
+            window.location.reload();
+          })
+          .catch((error) => {
+            console.error("Fetch Error: ", error);
+          });
+      });
+    });
+    //end Product
+
+    //Loan
+    const deleteLoanButtons = document.querySelectorAll(".delete-button-loan");
+
+    deleteLoanButtons.forEach(function (deleteButton) {
+      deleteButton.addEventListener("click", function () {
+        console.log("clicked")
+        const id = deleteButton.getAttribute("data-id");
+        const url = `/api/loan/delete/${id}`;
+        console.log("clicked");
+        fetch(url, {
+          method: "DELETE",
+          headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "Content-Type": "application/json",
+          },
+        })
+          .then(async (response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log(data);
+            window.location.reload();
+          })
+          .catch((error) => {
+            console.error("Fetch Error: ", error);
+          });
+      });
+    });
+    //end Loan
+
+    //Software Cost
+    const deleteSoftwareButtons = document.querySelectorAll(".delete-button-software");
+
+    deleteSoftwareButtons.forEach(function (deleteButton) {
+      deleteButton.addEventListener("click", function () {
+        console.log("clicked")
+        const id = deleteButton.getAttribute("data-id");
+        const url = `/api/software-cost/delete/${id}`;
+        console.log("clicked");
+        fetch(url, {
+          method: "DELETE",
+          headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "Content-Type": "application/json",
+          },
+        })
+          .then(async (response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log(data);
+            window.location.reload();
+          })
+          .catch((error) => {
+            console.error("Fetch Error: ", error);
+          });
+      });
+    });
+    //end Software Cost
+
+    //Equity
+    const deleteEquityButtons = document.querySelectorAll(".delete-button-equity");
+
+    deleteEquityButtons.forEach(function (deleteButton) {
+      deleteButton.addEventListener("click", function () {
+        console.log("clicked")
+        const id = deleteButton.getAttribute("data-id");
+        const url = `/api/owner-equity/delete/${id}`;
+        console.log("clicked");
+        fetch(url, {
+          method: "DELETE",
+          headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "Content-Type": "application/json",
+          },
+        })
+          .then(async (response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log(data);
+            window.location.reload();
+          })
+          .catch((error) => {
+            console.error("Fetch Error: ", error);
+          });
+      });
+    });
+    //end Equity
+
+  });
   </script>
 </body>
 

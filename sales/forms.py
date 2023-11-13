@@ -1,8 +1,8 @@
 from django import forms
-from .models import Sales, Customer,Product,SalesLineItems ,ShippingInformation
+from .models import Sales, Stakeholder,Product,SalesLineItems ,ShippingInformation
 
 class SalesForm(forms.ModelForm):
-    customer_id = forms.ModelChoiceField(queryset=Customer.objects.all())
+    customer_id = forms.ModelChoiceField(queryset=Stakeholder.objects.all())
 
 
     class Meta:
@@ -16,8 +16,13 @@ class SalesForm(forms.ModelForm):
 
 class CustomerForm(forms.ModelForm):
     class Meta:
-        model = Customer
-        fields = '__all__'  # Use all fields from the model in the form.
+        model = Stakeholder
+        fields = [
+            'customer_id', 'name','company',
+            'email','handphone','address','delivery_address','tax_information','website',
+            'linkedin', 'facebook',
+            'tiktok'
+        ]  # Use all fields from the model in the form.
 
 
 class SalesLineItemsForm(forms.ModelForm):

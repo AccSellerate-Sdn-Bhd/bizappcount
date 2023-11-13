@@ -1,8 +1,32 @@
 from django.db import models
 from user_onboard.models import Address, Business, User ,Product
 import uuid
+
+class Stakeholder(models.Model):
+    customer_id = models.CharField(max_length=255, primary_key=True)
+    user_id = models.ForeignKey(User, on_delete=models.DO_NOTHING, db_column='user_id', null=True)
+    name = models.CharField(max_length=255)
+    company = models.CharField(max_length=255, null=True, blank=True)
+    email = models.EmailField(max_length=255, null=True, blank=True)
+    handphone = models.CharField(max_length=255, null=True, blank=True)
+    address = models.TextField(null=True, blank=True)
+    delivery_address = models.TextField(null=True, blank=True)
+    tax_information = models.CharField(max_length=255, null=True, blank=True)
+    website = models.URLField(max_length=255, null=True, blank=True)
+    linkedin = models.URLField(max_length=255, null=True, blank=True) # Using URLField for web links
+    facebook = models.URLField(max_length=255, null=True, blank=True)
+    tiktok = models.URLField(max_length=255, null=True, blank=True)
+    type =  models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name  # return the name field as the string representation
+
+    class Meta:
+        db_table = 'stakeholder'
+
 class Customer(models.Model):
     customer_id = models.CharField(max_length=255, primary_key=True)
+    user_id = models.ForeignKey(User, on_delete=models.DO_NOTHING, db_column='user_id', null=True)
     name = models.CharField(max_length=255)
     company = models.CharField(max_length=255, null=True, blank=True)
     email = models.EmailField(max_length=255, null=True, blank=True)
@@ -25,7 +49,7 @@ class Customer(models.Model):
 class Sales(models.Model):
     sales_id = models.CharField(primary_key=True, max_length=255)
     user_id = models.ForeignKey(User, on_delete=models.DO_NOTHING, db_column='user_id')
-    customer_id =  models.ForeignKey(Customer, on_delete=models.DO_NOTHING, db_column='customer_id')
+    customer_id =  models.ForeignKey(Stakeholder, on_delete=models.DO_NOTHING, db_column='customer_id')
     title = models.CharField(max_length=255)
     bizapp_transaction_no = models.CharField(max_length=255)
     date = models.DateTimeField()

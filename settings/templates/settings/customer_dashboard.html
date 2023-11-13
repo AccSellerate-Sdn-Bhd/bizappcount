@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between mb-3">
+  <h1>Customers</h1>
+  <a href="customer/create" class="btn btn-success">Create Customer</a>
+</div>
+
+<table class="table table-striped table-bordered table-hover">
+  <thead class="thead-dark">
+    <tr>
+      <th>No.</th>
+      <th>Name</th>
+      <th>Company</th>
+      <th>Email</th>
+      <th>Phone Number</th>
+      <th>Address</th>
+      <th>Delivery Address</th>
+      <th>Tax Information</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Loop through your sales data and populate this table -->
+    {% for item in customer_data %}
+    <tr>
+      <td>{{ forloop.counter }}</td>
+      <td>{{ item.name }}</td>
+      <td>{{ item.company}}</td>
+      <td>{{ item.email }}</td>
+      <td>{{ item.handphone }}</td>
+      <td>{{ item.address }}</td>
+      <td>{{ item.delivery_address }}</td>
+      <td>{{ item.tax_information }}</td>
+      <td>
+        <!-- Here, you can add buttons or links for specific actions like edit or delete -->
+        <a href="{% url 'edit_customer' item.customer_id %}" class="btn btn-primary btn-sm">Edit</a>
+        {% csrf_token %}
+        <a href="{% url 'delete_customer' item.customer_id %}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">Delete</a>
+       
+        
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const deleteButtons = document.querySelectorAll(".delete-button");
+
+    deleteButtons.forEach(function (deleteButton) {
+      deleteButton.addEventListener("click", function () {
+        const id = deleteButton.getAttribute("data-id");
+        const url = `dashboard/settings/customer/delete/${id}`;
+        console.log("clicked");
+        fetch(url, {
+          method: "DELETE",
+          headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "Content-Type": "application/json",
+          },
+        })
+          .then(async (response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log(data);
+            window.location.reload();
+          })
+          .catch((error) => {
+            console.error("Fetch Error: ", error);
+          });
+      });
+    });
+  });
+</script>
+
+</div>
+
+{% endblock %}

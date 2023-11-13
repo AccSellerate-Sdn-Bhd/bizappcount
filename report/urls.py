@@ -9,7 +9,7 @@ urlpatterns = [
     path('general-ledger', views.generalledgerreports, name='general_ledger'),
     path('inventory-report', views.inventoryreports, name='inventory_report'),
 
-    path('generate_ledger_profit_and_loss', views.getpandlreportsdata, name='profit_and_loss'),
+    path('convert_to_ledger/<str:url>/', views.convertToLedger, name='convert_to_ledger'),
 
     path('generate_profit_and_loss', views.generate_profit_and_loss_report, name='generate_pdf_report'),
     path('generate_balance_sheet', views.generate_balance_sheet_report, name='generate_pdf_report'),

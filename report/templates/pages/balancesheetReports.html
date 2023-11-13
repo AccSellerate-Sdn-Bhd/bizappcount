@@ -1,9 +1,20 @@
 {% extends "base.html" %}
 
 {% block content %}
+{% load filter_tags %}
 <div class="d-flex justify-content-between mb-3">
   <h1>Balance Sheet Report</h1>
-  <a href="/dashboard/reports/generate_balance_sheet" class="btn btn-success">Download PDF</a>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="flex flex-row space-x-3">
+      {{form.start_date}}
+      {{form.end_date}}
+      <!-- <a href="/dashboard/reports/generate_balance_sheet" class="btn btn-success">Download PDF</a> -->
+      <button class="btn btn-success" type="submit">Generate Report</button>
+      <a href="/dashboard/reports/convert_to_ledger/balance-sheet/" class="btn btn-success">Convert Journals</a>
+    </div>
+  </form>
 </div>
 
 <table class="border w-full">
@@ -39,21 +50,65 @@
       <td class="border"></td>
     </tr>
     <!-- Add more lines of content -->
+    {% if compareAssetLiabilities %}
+    {% for asset in assets.data %}
     <tr>
-      <td class="border">1</td>
-      <td class="border">Row 1, Cell 2</td>
-      <td class="border">0.00</td>
-      <td class="border">2</td>
-      <td class="border">Row 1, Cell 2</td>
-      <td class="border">0.00</td>
+      <td class="border">{{forloop.counter}}</td>
+      <td class="border">{{asset.account.name}}</td>
+      <td class="border">{{asset.amount|default:0}}</td>
+
+      {% with counter_plus_1=forloop.counter|add:"-1" %}
+
+      {% if counter_plus_1 < liabilities.data|length %} <td class="border">{{counter_plus_1|add:"1"}}</td>
+        <td class="border">{{ liabilities.data|get_item_name:counter_plus_1|default:'' }}</td>
+        <td class="border">{{ liabilities.data|get_item_amount:counter_plus_1|default:'0' }}</td>
+        {% else %}
+        <td class="border"></td>
+        <td class="border"></td>
+        <td class="border"></td>
+        {% endif %}
+        {% endwith %}
+
+    </tr>
+    {% endfor %}
+    {% else %}
+    {% for liability in liabilities.data %}
+    <tr>
+
+
+      {% with counter_plus_1=forloop.counter|add:"-1" %}
+
+      {% if counter_plus_1 < assets.data|length %} <td class="border">{{counter_plus_1|add:"1"}}</td>
+        <td class="border">{{ assets.data|get_item_name:counter_plus_1|default:'' }}</td>
+        <td class="border">{{ assets.data|get_item_amount:counter_plus_1|default:'0' }}</td>
+        {% else %}
+        <td class="border"></td>
+        <td class="border"></td>
+        <td class="border"></td>
+        {% endif %}
+        <td class="border">{{forloop.counter}}</td>
+        <td class="border">{{liability.account.name}}</td>
+        <td class="border">{{liability.amount|default:""}}</td>
+        {% endwith %}
+
+    </tr>
+    {% endfor %}
+    {% endif %}
+    <tr>
+      <td class="border h-7"></td>
+      <td class="border"></td>
+      <td class="border"></td>
+      <td class="border"></td>
+      <td class="border"></td>
+      <td class="border"></td>
     </tr>
     <tr>
       <td class="border"></td>
       <td class="border font-bold">Total Assets</td>
-      <td class="border"></td>
+      <td class="border">{{assets.total}}</td>
       <td class="border"></td>
       <td class="border font-bold">Total Current Liabilities</td>
-      <td class="border"></td>
+      <td class="border">{{liabilities.total}}</td>
     </tr>
 
     <tr>
@@ -74,21 +129,64 @@
       <td class="border"></td>
     </tr>
     <!-- Add more lines of content -->
+    {% if compareFixedAssetsEquity %}
+    {% for fixed_asset in fixed_assets.data %}
     <tr>
-      <td class="border">1</td>
-      <td class="border">Row 1, Cell 2</td>
-      <td class="border">0.00</td>
-      <td class="border">2</td>
-      <td class="border">Row 1, Cell 2</td>
-      <td class="border">0.00</td>
+      <td class="border">{{forloop.counter}}</td>
+      <td class="border">{{fixed_asset.account.name}}</td>
+      <td class="border">{{fixed_asset.amount|default:0}}</td>
+
+      {% with counter_plus_1=forloop.counter|add:"-1" %}
+
+      {% if counter_plus_1 < equity.data|length %} <td class="border">{{counter_plus_1|add:"1"}}</td>
+        <td class="border">{{ equity.data|get_item_name:counter_plus_1|default:'' }}</td>
+        <td class="border">{{ equity.data|get_item_amount:counter_plus_1|default:'0' }}</td>
+        {% else %}
+        <td class="border"></td>
+        <td class="border"></td>
+        <td class="border"></td>
+        {% endif %}
+        {% endwith %}
+
+    </tr>
+    {% endfor %}
+    {% else %}
+    {% for equity in equity.data %}
+    <tr>
+      {% with counter_plus_1=forloop.counter|add:"-1" %}
+
+      {% if counter_plus_1 < fixed_assets.data|length %} <td class="border">{{counter_plus_1|add:"1"}}</td>
+        <td class="border">{{ fixed_assets.data|get_item_name:counter_plus_1|default:'' }}</td>
+        <td class="border">{{ fixed_assets.data|get_item_amount:counter_plus_1|default:'0' }}</td>
+        {% else %}
+        <td class="border"></td>
+        <td class="border"></td>
+        <td class="border"></td>
+        {% endif %}
+        <td class="border">{{forloop.counter}}</td>
+        <td class="border">{{equity.account.name}}</td>
+        <td class="border">{{equity.amount|default:"0"}}</td>
+        {% endwith %}
+
+    </tr>
+    {% endfor %}
+    {% endif %}
+
+    <tr>
+      <td class="border h-7"> </td>
+      <td class="border"> </td>
+      <td class="border"> </td>
+      <td class="border"> </td>
+      <td class="border"> </td>
+      <td class="border"> </td>
     </tr>
     <tr>
       <td class="border"></td>
       <td class="border font-bold">Total Fixed Assets</td>
-      <td class="border"></td>
+      <td class="border">{{fixed_assets.total|default:0}}</td>
       <td class="border"></td>
       <td class="border font-bold">Total Equities</td>
-      <td class="border"></td>
+      <td class="border" {{equity.total|default:0}}></td>
     </tr>
 
     <tr>
@@ -111,10 +209,10 @@
     <tr>
       <td class="border"></td>
       <td class="border font-bold">Total Assets</td>
-      <td class="border"></td>
+      <td class="border">{{totalAssets}}</td>
       <td class="border"></td>
       <td class="border font-bold">Total Liabilities and Equities</td>
-      <td class="border"></td>
+      <td class="border">{{totalLiabilities}}</td>
     </tr>
   </tbody>
 </table>

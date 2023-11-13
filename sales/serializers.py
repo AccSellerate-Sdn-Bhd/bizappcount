@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Sales,Customer,SalesLineItems,Product,SalesFooter,ShippingInformation
+from .models import Sales,Stakeholder,Customer,SalesLineItems,Product,SalesFooter,ShippingInformation
 class SalesLineItemsSerializer(serializers.ModelSerializer):
     class Meta:
         model = SalesLineItems

@@ -3,26 +3,34 @@
 {% block content %}
 <div class="d-flex justify-content-between mb-3">
   <h1>Cash Flow Report</h1>
-  <a href="/dashboard/reports/generate_cash_flow" class="btn btn-success">Download PDF</a>
+  <form method="post">
+    {% csrf_token %}
+    <div class="flex flex-row space-x-3">
+      {{form.start_date}}
+      {{form.end_date}}
+      <!-- <a href="/dashboard/reports/generate_cash_flow" class="btn btn-success">Download PDF</a> -->
+      <button class="btn btn-success" type="submit">Generate Report</button>
+      <a href="/dashboard/reports/convert_to_ledger/cash-flow/" class="btn btn-success">Convert Ledger</a>
+    </div>
+  </form>
 </div>
 
 <table class="w-full border-collapse border">
   <thead class="bg-gray-300">
     <tr>
       <th class="border p-2 w-2/12">Cash Received:</th>
-      <th class="border p-2">Janurary</th>
-      <th class="border p-2">February</th>
+      <th class="border p-2"></th>
     </tr>
   </thead>
   <tbody>
+    {% for revenue in revenues.data %}
     <tr>
-      <td class="border p-2">Sales Revenue</td>
-      <td class="border p-2">0.00</td>
-      <td class="border p-2">0.00</td>
+      <td class="border p-2">{{revenue.account.name}}</td>
+      <td class="border p-2">{{revenue.amount}}</td>
     </tr>
+    {% endfor %}
     <tr>
       <td class="border h-9"></td>
-      <td class="border"> </td>
       <td class="border"> </td>
     </tr>
   </tbody>
@@ -30,29 +38,27 @@
     <tr>
       <th class="border p-2">Expenditures:</th>
       <th class="border p-2"></th>
-      <th class="border p-2"></th>
     </tr>
   </thead>
   <tbody>
+    {% for expense in expenses.data %}
     <tr>
-      <td class="border p-2">Sales Revenue</td>
-      <td class="border p-2">0.00</td>
-      <td class="border p-2">0.00</td>
+      <td class="border p-2">{{expense.account.name}}</td>
+      <td class="border p-2">{{expense.amount}}</td>
     </tr>
+    {% endfor %}
     <tr>
       <td class="border h-9"></td>
       <td class="border"> </td>
-      <td class="border"> </td>
+
     </tr>
     <tr>
       <td class="border p-2">Net Cash Flow</td>
-      <td class="border p-2">0.00</td>
-      <td class="border p-2">0.00</td>
+      <td class="border p-2">{{net_cash_flow}}</td>
     </tr>
     <tr>
       <td class="border p-2">Ending Cash Balance</td>
-      <td class="border p-2">0.00</td>
-      <td class="border p-2">0.00</td>
+      <td class="border p-2">{{ending_balance}}</td>
     </tr>
   </tbody>
 
